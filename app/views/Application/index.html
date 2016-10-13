@@ -1,0 +1,117 @@
+#{extends 'main.html' /}
+#{set title:'Web Primers [início]' /}
+
+<div class="container-fluid">
+  <div class="page-header">
+    <h1>Web Primers <small>Sistema de seleção de primers</small></h1>
+  </div>
+
+
+  #{form @Application.process(), enctype:'multipart/form-data'}
+
+    <div class="panel panel-default panel-success">
+      <div class="panel-heading">Adicione os parametros necessarios para iniciar</div>
+      <div class="panel-body">
+
+        <div class="form-group">
+          <label for="alfa" class="col-sm-2 control-label">Arquivo ALFA:</label>
+          <div class="col-sm-10">
+            <input id="alfa" type="file" class="form-control file" name="parametro.alfa">
+            <span class="help-block">Selecione um arquivo de texto ou FASTA de sequência de DNA.</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="beta" class="col-sm-2 control-label">Arquivo BETA:</label>
+          <div class="col-sm-10">
+            <input id="beta" type="file" class="form-control file" name="parametro.beta">
+            <span class="help-block">Selecione um arquivo de texto ou FASTA de sequência de DNA.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="k" class="col-sm-2 control-label">Diferenças:</label>
+          <div class="col-sm-1">
+            <input id="k" type="text" class="form-control" placeholder="1" name="parametro.k">
+            
+          </div> 
+          <span class="help-block">Digite a quantidade de diferenças desejada do primer para qualquer segmento da sequência BETA.<br/>
+          O valor deve estar entre 1 e o tamanho de ALFA.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-default panel-info">
+      <div class="panel-heading">Semelhança das sequências</div>
+      <div class="panel-body">
+        <label class="radio-inline">
+          <input type="radio" name="parametro.tipoKdiference" id="sequencia-diferente" value="1" checked> Sequências diferentes
+        </label>
+        <label class="radio-inline">
+          <input type="radio" name="parametro.tipoKdiference" id="sequencia-semelhante" value="2"> Sequências semelhantes
+        </label>
+      </div>
+    </div>
+
+    <div class="panel panel-default panel-info">
+      <div class="panel-heading">Posições</div>
+      <div class="panel-body">
+
+        <div class="col-sm-3" style="margin-left: 225px;">
+          <div class="radio">
+            <input type="radio" name="parametro.tipoProcessamento" id="todas-posicao" value="1" checked>
+            Processar todas as posiçoes possiveis.
+          </div>
+          <div class="radio">
+            <input type="radio" name="parametro.tipoProcessamento" id="uma-posicao" value="2">
+            Selecionar uma posição e uma distância.               
+          </div> 
+        </div>
+      </div>
+
+      <div class="form-group" id="opcoes">
+        <div style="margin-left: 225px;">
+          <label for="j" class="col-sm-1 control-label">Índice j:</label>
+          <div class="col-sm-1">
+            <input id="j" type="text" class="form-control" name="parametro.j">
+          </div>
+
+          <label for="distancia" class="col-sm-1 control-label">Distância:</label>
+          <div class="col-sm-1">
+            <input id="distancia" type="text" class="form-control" name="parametro.distancia">
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <div class="pull-right">
+        <input class="btn btn-primary" type="submit" value="Processar">
+      </div>
+
+  #{/form}
+
+
+      <script>
+        $( document ).ready(function() {
+
+          $("#k, #j, #distancia").keypress(function (e) {
+            if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+               return false;
+             }
+          });
+
+
+          $("#todas-posicao").change(function(){
+            if(this.checked) {
+              $("#opcoes").hide();
+            }
+          });
+
+          $("#uma-posicao").change(function(){
+            if(this.checked) {
+              $("#opcoes").show();
+            }
+          });
+
+          $("#opcoes").hide();
+        });
+      </script>
