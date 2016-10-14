@@ -2,8 +2,35 @@
 #{set title:'Web Primers [Processando]' /}
 
 <div class="container-fluid">
-  <div class="page-header">
-    <h1>Web Primers <small>Sistema de seleção de primers</small></h1>
+    <div class="page-header">
+        <h1>Web Primers <small>Sistema de seleção de primers</small></h1>
+    </div>
+    <div>
+        <label class="label">Programa:</label>
+        <span>${programa}</span>
+    </div>
+  <div>
+    <ul class="nav nav-tabs">
+      <li class="active">
+          <label class="btn btn-primary"> Sequência alfa <span class="badge">${alfa.quantidadeCaracteres}</span></label>
+     #{if (alfa.fasta)} <label class="label label-info">FASTA</label> #{/if}
+      </li>
+
+    </ul>
+      <p style="font-size:8px">${alfa.sequencia}</p>
+      <ul>
+          #{list items:re, as:'re'}
+          <li>${re.sequencia}</li>
+          #{/list}
+      </ul>
   </div>
+
+  <div>
+      <label class="btn btn-warning">Sequência beta <span class="badge">${beta.quantidadeCaracteres}</span></label>
+      #{if (beta.fasta)} <label class="label label-info">FASTA</label> #{/if}
+    <p style="font-size:8px">${beta.sequencia}</p>
+  </div>
+
+</div>
 
   
