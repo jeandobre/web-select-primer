@@ -18,9 +18,11 @@ public class Resultado {
         List<Resultado> resultados = new ArrayList<Resultado>();
         try{
             BufferedReader br = new BufferedReader(new FileReader(file));
+            int count = 0;
             while(br.ready()){
                 String linha = br.readLine();
-                if(linha.charAt(0) == '>'){
+                if(count == 0){
+                    count++;
                     continue;
                 }
                 Resultado r = new Resultado();

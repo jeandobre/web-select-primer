@@ -47,43 +47,48 @@
     </div>
 
     <div class="panel panel-default panel-info">
-      <div class="panel-heading">Semelhança das sequências</div>
-      <div class="panel-body">
-        <label class="radio-inline">
-          <input type="radio" name="parametro.tipoKdiference" id="sequencia-diferente" value="1" checked> Sequências diferentes
-        </label>
-        <label class="radio-inline">
-          <input type="radio" name="parametro.tipoKdiference" id="sequencia-semelhante" value="2"> Sequências semelhantes
-        </label>
-      </div>
-    </div>
-
-    <div class="panel panel-default panel-info">
-      <div class="panel-heading">Posições</div>
+      <div class="panel-heading">Opções</div>
       <div class="panel-body">
 
-        <div class="col-sm-3" style="margin-left: 225px;">
-          <div class="radio">
-            <input type="radio" name="parametro.tipoProcessamento" id="todas-posicao" value="1" checked>
-            Processar todas as posições possiveis.
-          </div>
-          <div class="radio">
-            <input type="radio" name="parametro.tipoProcessamento" id="uma-posicao" value="2">
-            Selecionar uma posição e uma distância.               
-          </div> 
-        </div>
-      </div>
-
-      <div class="form-group" id="opcoes">
-        <div style="margin-left: 225px;">
-          <label for="j" class="col-sm-1 control-label">Índice j:</label>
-          <div class="col-sm-1">
-            <input id="j" type="text" class="form-control" name="parametro.j">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="bs-callout bs-callout-warning">
+              <h4>Tipos de sequência</h4>
+            </div>
+            <label class="radio-inline">
+              <input type="radio" name="parametro.tipoKdiference" id="sequencia-diferente" value="1" checked> Sequências diferentes
+            </label>
+            <label class="radio-inline">
+              <input type="radio" name="parametro.tipoKdiference" id="sequencia-semelhante" value="2"> Sequências semelhantes
+            </label>
           </div>
 
-          <label for="distancia" class="col-sm-1 control-label">Distância:</label>
-          <div class="col-sm-1">
-            <input id="distancia" type="text" class="form-control" name="parametro.distancia">
+          <div class="col-md-6">
+            <div class="bs-callout bs-callout-warning">
+              <h4>Posições</h4>
+            </div>
+            <div class="radio">
+              <input type="radio" name="parametro.tipoProcessamento" id="todas-posicao" value="1" checked>
+              Processar todas as posições possiveis.
+            </div>
+            <div class="radio">
+              <input type="radio" name="parametro.tipoProcessamento" id="uma-posicao" value="2">
+              Selecionar uma posição e uma distância.
+            </div>
+
+            <div class="form-group" id="opcoes">
+              <div>
+                <label for="j" class="col-sm-2 control-label">Índice j:</label>
+                <div class="col-sm-2">
+                    <input id="j" type="text" class="form-control" name="parametro.j">
+                </div>
+
+                <label for="distancia" class="col-sm-2 control-label">Distância:</label>
+                <div class="col-sm-2">
+                    <input id="distancia" type="text" class="form-control" name="parametro.distancia">
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -94,7 +99,7 @@
       </div>
 
   #{/form}
-
+</div>
 
       <script>
         $( document ).ready(function() {

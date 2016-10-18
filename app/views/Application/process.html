@@ -6,7 +6,7 @@
         <h1>Web Primers <small>Sistema de seleção de primers</small></h1>
     </div>
     <div>
-        <label class="label">Programa:</label>
+        <label class="label label-default">Programa:</label>
         <span>${programa}</span>
     </div>
   <div>
@@ -14,15 +14,25 @@
       <li class="active">
           <label class="btn btn-primary"> Sequência alfa <span class="badge">${alfa.quantidadeCaracteres}</span></label>
      #{if (alfa.fasta)} <label class="label label-info">FASTA</label> #{/if}
+          <label class="label ">${alfa.nome}</label>
       </li>
-
     </ul>
-      <p style="font-size:8px">${alfa.sequencia}</p>
-      <ul>
-          #{list items:re, as:'re'}
-          <li>${re.sequencia}</li>
-          #{/list}
-      </ul>
+      <div class="progress">
+          <div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%">
+              alfa
+          </div>
+      </div>
+      <div class="controle">
+          <p class="sequencia">${alfa.sequencia}</p>
+          <div class="resultado">
+              <ul >
+                  #{list items:re, as:'re'}
+                  <li style="margin-left: ${re.j * 6}px;">${re.sequencia}</li>
+                  #{/list}
+              </ul>
+          </div>
+      </div>
+
   </div>
 
   <div>

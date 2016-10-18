@@ -1,3 +1,39 @@
 .form-control{
     height: auto !important;
 }
+
+.controle{
+    height: 250px;
+    overflow: scroll;
+}
+
+.sequencia{
+   font-size: 8px;
+   margin-top: 15px;
+   margin-bottom: 0px;
+}
+
+.resultado{
+   font-size: 8px;
+   height: 200px;
+}
+
+.resultado ul{
+  margin-left: 0px;
+  list-style: none;
+  padding: 0px;
+}
+
+.resultado ul li{
+
+}
+
+.page-header{
+   padding-bottom: 0px !important;
+   margin: 10px 0 5px;
+   border-bottom: none;
+
+}
+.bs-callout-warning h4 {
+    color: #aa6708;
+}
