@@ -1,46 +1,112 @@
 #{extends 'main.html' /}
 #{set title:'Web Primers [Processando]' /}
 
-<div class="container-fluid">
+  <div class="container-fluid">
     <div class="page-header">
         <h1>Web Primers <small>Sistema de seleção de primers</small></h1>
     </div>
-    <div>
+
+    <div class="panel">
         <label class="label label-default">Programa:</label>
         <span>${programa}</span>
     </div>
-  <div>
-    <ul class="nav nav-tabs">
-      <li class="active">
-          <label class="btn btn-primary"> Sequência alfa <span class="badge">${alfa.quantidadeCaracteres}</span></label>
-     #{if (alfa.fasta)} <label class="label label-info">FASTA</label> #{/if}
-          <label class="label ">${alfa.nome}</label>
-      </li>
-    </ul>
-      <div class="progress">
-          <div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%">
-              alfa
+    <div class="panel">
+        <label class="label label-primary">Sequência alvo:</label>
+        <span>${alfa.nome}</span>
+        #{if (alfa.fasta)} <label class="label label-info">FASTA</label> #{/if}
+    </div>
+    <div class="panel">
+        <label class="label label-primary">Quantidade de caracteres:</label>
+        <span>${alfa.quantidadeCaracteres}</span>
+    </div>
+
+
+    <div class="bloco">
+      <span id="j"></span>
+        <div id="mouse" class="bordas"></div>
+        <div class="fundo-sequencia" style="width: ${alfa.quantidadeCaracteres}px">
+            <div class="sequencia" style="margin-left: ${ocr.inicio}px;width: ${ocr.quantidade}px"></div>
+        </div>
+
+      <div id="bordas-left" class="bordas"></div>
+      <div id="bordas-right" class="bordas"></div>
+      <div id="ocorrencia" class="ocorrencia"></div>
+      <span id="r"></span>
+
+    </div>
+
+
+      <div class="margem-10">
+          <span class="badge">${ocr.quantidade}</span> <a href="#" class="testlink">ocorrências</a>
+          <span>com ${k} diferenças em relação à qualquer segmento da sequencia </span>
+          <span class="label label-info">${beta.nome}</span>
+      </div>
+
+      <div class="panel panel-default">
+          <div class="panel-body">
+            Posiçao: <label id="indice"></label>
+            Tamanho: <label id="tamanho"></label>
+            </br>
+            Segmento: <label id="prime"></label>
           </div>
       </div>
-      <div class="controle">
-          <p class="sequencia">${alfa.sequencia}</p>
-          <div class="resultado">
-              <ul >
-                  #{list items:re, as:'re'}
-                  <li style="margin-left: ${re.j * 6}px;">${re.sequencia}</li>
-                  #{/list}
-              </ul>
-          </div>
+
+      <div class="pull-right">
+          <a id="novo" class="btn btn-primary" href="/">Novo processamento</a>
+          <buttom id="salvar" class="btn btn-success" type="buttom">Guardar resultado</buttom>
       </div>
 
   </div>
 
-  <div>
-      <label class="btn btn-warning">Sequência beta <span class="badge">${beta.quantidadeCaracteres}</span></label>
-      #{if (beta.fasta)} <label class="label label-info">FASTA</label> #{/if}
-    <p style="font-size:8px">${beta.sequencia}</p>
-  </div>
+<script>
+  function processa(j){
+       $.getJSON( "/posicao/" + j, function( data ) {
+           var r = data.tamanho;
+           var t = (j + (r - 6) );
 
-</div>
+           $("#ocorrencia").css("margin-left", j + "px");
+           $("#ocorrencia").css("width",r + "px");
+
+           $("#bordas-left").css("left", j + "px");
+           $("#bordas-right").css("left", t + "px");
+
+           $("#j").html(j);
+           $("#j").css("margin-left", j + "px");
+
+           $("#r").html(r);
+           $("#r").css("margin-left", t + "px");
+
+           $("#prime").html( data.sequencia );
+           $("#indice").html(data.j);
+           $("#tamanho").html(data.tamanho);
+       });
+  }
+
+$( document ).ready(function() {
+    $("#mouse").hide();
+
+    $( ".sequencia" )
+        .hover( function() {$("#mouse").show();}, function() {/* $("#mouse").hide(); */})
+
+        .mousemove( function( event ) {
+           var j = event.pageX - 1;
+           //var position = $(".sequencia").position();
+           //j = j + Math.trunc(position.left) * -1;
+           $("#mouse").css("left", j);
+        })
+        .click( function( event ) {
+           var j = event.pageX - 1;
+           //$(".testlink").html(j);
+
+           var position = $(".sequencia").position();
+           j = j + Math.trunc(position.left) * -1;
+           //  alert(j);
+           processa(j);
+
+        });
+
+    processa(${j});
+});
+</script>
 
   

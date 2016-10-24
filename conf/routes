@@ -5,6 +5,7 @@
 # Home page
 GET     /                                       Application.index
 POST    /process                                Application.process
+GET     /posicao/{<[0-9]+>j}                    Application.posicao(format:'json')
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

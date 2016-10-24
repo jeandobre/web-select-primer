@@ -21,7 +21,10 @@ public class Application extends Controller {
     public static final String localEntrada = Play.configuration.getProperty("diretorio.entrada");
     public static final String localSaida = Play.configuration.getProperty("diretorio.saida");
 
+    public static List<Resultado> re;
+
     public static void index() {
+        re = null;
         render();
     }
 
@@ -68,8 +71,15 @@ public class Application extends Controller {
             commandLine += " -b " + beta.nome;
             commandLine += " -k " + parametro.k;
             commandLine += " -sf " + localSaida + "/out";
+            Integer i = 0;
+
+            if (!parametro.tipoProcessamento) {
+                commandLine += " -j " + parametro.j + " " + parametro.distancia;
+                i = parametro.j;
+            }
+
             //
-            System.out.println(commandLine);
+            //System.out.println(commandLine);
 
             if (validation.hasErrors()) {
                 validation.keep();
@@ -77,8 +87,11 @@ public class Application extends Controller {
             } else {
 
                 execCommand(commandLine);
-                List<Resultado> re = Resultado.computaResultado(localSaida + "/out");
-                render(alfa, beta, programa, re);
+                re = Resultado.computaResultado(localSaida + "/out");
+                Integer j = re.get(0).j;
+                Ocorrencia ocr = new Ocorrencia(i, i + re.size(), re.size());
+                Integer k = parametro.k;
+                render(alfa, beta, programa, ocr, k, j);
             }
         }
     }
@@ -95,6 +108,13 @@ public class Application extends Controller {
         } catch (InterruptedException e){
             e.printStackTrace();
         }
+    }
+
+    public static void posicao(int j){
+        Integer inicio = re.get(0).j;
+        inicio = j - inicio;
+        Resultado r = re.get(inicio);
+        render(r);
     }
 
 }

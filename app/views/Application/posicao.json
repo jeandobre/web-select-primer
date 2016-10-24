@@ -1,0 +1,5 @@
+{
+  "j": "${r.j}",
+  "tamanho": "${r.tamanho}",
+  "sequencia": "${r.sequencia}"
+}

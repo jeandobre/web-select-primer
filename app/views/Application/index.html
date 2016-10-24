@@ -1,5 +1,10 @@
 #{extends 'main.html' /}
 #{set title:'Web Primers [início]' /}
+<div class="div-ajax-carregamento-pagina">
+  <div id="dialog" title="Processamento">
+    <p>Aguarde, processando...</p>
+  </div>
+</div>
 
 <div class="container-fluid">
   <div class="page-header">
@@ -20,17 +25,17 @@
       <div class="panel-body">
 
         <div class="form-group">
-          <label for="alfa" class="col-sm-2 control-label">Arquivo ALFA:</label>
+          <label for="alfa" class="col-sm-2 control-label">Sequência alvo:</label>
           <div class="col-sm-10">
             <input id="alfa" type="file" class="form-control file" name="parametro.alfa">
-            <span class="help-block">Selecione um arquivo de texto ou FASTA de sequência de DNA.</span>
+            <span class="help-block">Selecione um arquivo de texto de sequência de DNA.</span>
           </div>
         </div>
         <div class="form-group">
-          <label for="beta" class="col-sm-2 control-label">Arquivo BETA:</label>
+          <label for="beta" class="col-sm-2 control-label">Sequência(s):</label>
           <div class="col-sm-10">
-            <input id="beta" type="file" class="form-control file" name="parametro.beta">
-            <span class="help-block">Selecione um arquivo de texto ou FASTA de sequência de DNA.</span>
+            <input id="beta" type="file" class="form-control file" name="parametro.beta" >
+            <span class="help-block">Selecione um arquivo de texto de sequência de DNA.</span>
           </div>
         </div>
 
@@ -95,7 +100,7 @@
     </div>
 
       <div class="pull-right">
-        <input class="btn btn-primary" type="submit" value="Processar">
+        <input id="processar" class="btn btn-primary" type="submit" value="Processar">
       </div>
 
   #{/form}
@@ -123,6 +128,12 @@
             }
           });
 
+          $("#processar").click(function(){
+            $('.div-ajax-carregamento-pagina').show();
+            $( "#dialog" ).dialog();
+          });
+
+          $('.div-ajax-carregamento-pagina').hide();
           $("#opcoes").hide();
         });
       </script>
