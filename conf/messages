@@ -1,1 +1,6 @@
 validation.required=%s é um campo obrigatório.
+validation.failed=Campos obrigatórios
+parametro.k=Quantidade de diferenças
+parametro.alfa=Sequência alvo
+parametro.beta=Sequências
+

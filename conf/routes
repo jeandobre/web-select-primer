@@ -6,7 +6,7 @@
 GET     /                                       Application.index
 POST    /process                                Application.process
 GET     /posicao/{<[0-9]+>j}                    Application.posicao(format:'json')
-POST    /erro                                   Application.erro
+GET     /erro                                   Application.erro
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

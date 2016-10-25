@@ -1,5 +1,6 @@
 package controllers;
 
+import com.sun.istack.internal.NotNull;
 import play.data.validation.Min;
 import play.data.validation.Required;
 import play.mvc.*;
@@ -9,13 +10,16 @@ import java.util.List;
 
 public class Parametros{
    @Required
+   @NotNull
    public File alfa;
 
    @Required
+   @NotNull
    public List<File> beta;
 
    @Required
    @Min(1)
+   @NotNull
    public Integer k;
 
    public Boolean tipoProcessamento;
@@ -26,7 +30,7 @@ public class Parametros{
 
    public Integer tipoKdiference; //1-parcedias, 2 - diferentes
 
-   public Boolean maiorMenor;
+   public Boolean maiorMenor = false;
    public Boolean regioesTamanhoFixo;
 
    @java.lang.Override

@@ -125,3 +125,11 @@
 #menor{
   background-color: #5cb85c;
 }
+
+.alert ul{
+
+}
+.alert li{
+   margin-left: 28px;
+   padding: 5px;
+}

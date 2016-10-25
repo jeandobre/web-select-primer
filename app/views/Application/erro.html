@@ -1,5 +1,5 @@
 #{extends 'main.html' /}
-#{set title:'Web Primers [Processando]' /}
+#{set title:'Web Primers [Erro]' /}
 
 <div class="container-fluid">
     <div class="page-header">
@@ -8,11 +8,15 @@
 
     #{ifErrors}
     <div class="alert alert-danger">
-        <strong>Erro!</strong>
+        <strong>Ocorreu um erro!</strong>
         #{errors}
         <li>${error}</li>
         #{/errors}
     </div>
     #{/ifErrors}
+
+    <div class="pull-right">
+        <a id="novo" class="btn btn-primary" href="/">Novo processamento</a>
+    </div>
 
 </div>

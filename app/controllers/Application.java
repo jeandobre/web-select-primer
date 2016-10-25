@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import play.data.validation.Valid;
 //import java.io.FileInputStream;
 
 //import models.*;
@@ -17,6 +18,7 @@ public class Application extends Controller {
 
     public static final String sequenciaParecida =  Play.configuration.getProperty("sequencia.parecida");
     public static final String sequenciaDiferente = Play.configuration.getProperty("sequencia.diferente");
+    public static final String heuristica = Play.configuration.getProperty("sequencia.heuristica");
 
     public static final String localEntrada = Play.configuration.getProperty("diretorio.entrada");
     public static final String localSaida = Play.configuration.getProperty("diretorio.saida");
@@ -54,62 +56,68 @@ public class Application extends Controller {
         render(alfa, beta, programa, ocr, k, j, maior, menor);
     }
 
-    public static void process(Parametros parametro){
+    public static void process(@Valid Parametros parametro){
+
+
+
         if(validation.hasErrors()) {
-            validation.valid(parametro);
+            validation.keep();
             erro();
         } else {
             Boolean fasta = (ConvertFASTA2txt.converter(parametro.alfa, localEntrada + parametro.alfa.getName()));
             Arquivo alfa = ValidCharDNA.validar(localEntrada + parametro.alfa.getName());
             alfa.fasta = fasta;
+            Arquivo beta = new Arquivo();
 
-            fasta = (ConvertFASTA2txt.converter(parametro.beta.get(0), localEntrada + parametro.beta.get(0).getName()));
-            Arquivo beta = ValidCharDNA.validar(localEntrada + parametro.beta.get(0).getName());
-            beta.fasta = fasta;
+            if(parametro.beta.get(0) == null || parametro.beta == null || parametro.beta.isEmpty()){
+                validation.addError("Erro", "É necessário adicionar uma ou mais sequências para o processamento!");
+            } else {
+                fasta = (ConvertFASTA2txt.converter(parametro.beta.get(0), localEntrada + parametro.beta.get(0).getName()));
+                beta = ValidCharDNA.validar(localEntrada + parametro.beta.get(0).getName());
+                beta.fasta = fasta;
+            }
 
             if (alfa.quantidadeCaracteres < parametro.k) {
-
+                validation.addError("Erro", "A quantidade de diferenças (k) não pode ser maior que a quantidade de caracteres da sequência alvo");
             }
 
             if (!parametro.tipoProcessamento) {
                 if (parametro.j == parametro.distancia) { //se o j for igual a distancia esta errado
-                     //validation.error("Erro", "O valor de j não pode ser igual à distância!");
+                     validation.addError("Erro", "O valor de j não pode ser igual à distância!");
                 }
                 if (parametro.j > alfa.quantidadeCaracteres) { //se
-                     //validation.error("Erro", "O valor de j deve estar no intervalo entre 0 e o tamanho de alfa!");
+                     validation.addError("Erro", "O valor de j deve estar no intervalo entre 0 e a quantidade de caracteres da sequência alvo");
                 }
-
             }
-
-            String commandLine;
-            String programa;
-            if (parametro.tipoKdiference == 1){
-                commandLine = sequenciaDiferente;
-                programa = "k-DifferencePrimer 1 -vs1";
-            }
-            else{
-                commandLine = sequenciaParecida;
-                programa = "k-DifferencePrimer 2 -vs1";
-            }
-
-            commandLine += " -a " + alfa.nome;
-            commandLine += " -b " + beta.nome;
-            commandLine += " -k " + parametro.k;
-            commandLine += " -sf " + localSaida + "/out";
-            Integer i = 0;
-
-            if (!parametro.tipoProcessamento) {
-                commandLine += " -j " + parametro.j + " " + parametro.distancia;
-                i = parametro.j;
-            }
-
-            //
-            //System.out.println(commandLine);
 
             if (validation.hasErrors()) {
                 validation.keep();
                 erro();
             } else {
+
+                String commandLine;
+                String programa;
+                if (parametro.tipoKdiference == 1){
+                    commandLine = sequenciaDiferente;
+                    programa = "k-DifferencePrimer 1 -vs1";
+                } else if (parametro.tipoKdiference == 2){
+                    commandLine = sequenciaParecida;
+                    programa = "k-DifferencePrimer 2 -vs1";
+                } else{
+                    commandLine = heuristica;
+                    programa = "k-DifferencePrimer heuristica";
+                }
+
+                commandLine += " -a " + alfa.nome;
+                commandLine += " -b " + beta.nome;
+                commandLine += " -k " + parametro.k;
+                commandLine += " -sf " + localSaida + "/out";
+                Integer i = 0;
+
+                if (!parametro.tipoProcessamento) {
+                    commandLine += " -j " + parametro.j + " " + parametro.distancia;
+                    i = parametro.j;
+                }
 
                 execCommand(commandLine);
                 result(parametro, alfa, beta, i, programa);
