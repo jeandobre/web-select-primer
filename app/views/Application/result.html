@@ -3,7 +3,7 @@
 
   <div class="container-fluid">
     <div class="page-header">
-        <h1>Web Primers <small>Sistema de seleção de primers</small></h1>
+        <h1>Web <small>Sistema de seleção de regiões específicas</small></h1>
     </div>
 
     <div class="panel">
@@ -20,9 +20,10 @@
         <span>${alfa.quantidadeCaracteres}</span>
     </div>
 
-
     <div class="bloco">
       <span id="j"></span>
+        <div id="maior" class="bordas"></div>
+        <div id="menor" class="bordas"></div>
         <div id="mouse" class="bordas"></div>
         <div class="fundo-sequencia" style="width: ${alfa.quantidadeCaracteres}px">
             <div class="sequencia" style="margin-left: ${ocr.inicio}px;width: ${ocr.quantidade}px"></div>
@@ -41,6 +42,20 @@
           <span>com ${k} diferenças em relação à qualquer segmento da sequencia </span>
           <span class="label label-info">${beta.nome}</span>
       </div>
+
+      #{if maior != null && menor != null }
+      <div class="margem-10">
+          <div>
+              <span class="label label-danger">Maior segmento:</span>
+              <span>posição ${maior.j} com tamanho ${maior.tamanho}</span>
+          </div>
+
+          <div style="margin-top: 5px;">
+              <span class="label label-success">Menor segmento:</span>
+              <span>posição ${menor.j} com tamanho ${menor.tamanho}</span>
+          </div>
+      </div>
+      #{/if}
 
       <div class="panel panel-default">
           <div class="panel-body">
@@ -106,6 +121,11 @@ $( document ).ready(function() {
         });
 
     processa(${j});
+
+    #{if maior != null && menor != null }
+        $("#maior").css("left", ${maior.j + 16});
+        $("#menor").css("left", ${menor.j + 16});
+    #{/if}
 });
 </script>
 

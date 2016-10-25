@@ -1,0 +1,18 @@
+#{extends 'main.html' /}
+#{set title:'Web Primers [Processando]' /}
+
+<div class="container-fluid">
+    <div class="page-header">
+        <h1>Web <small>Sistema de seleção de regiões específicas</small></h1>
+    </div>
+
+    #{ifErrors}
+    <div class="alert alert-danger">
+        <strong>Erro!</strong>
+        #{errors}
+        <li>${error}</li>
+        #{/errors}
+    </div>
+    #{/ifErrors}
+
+</div>

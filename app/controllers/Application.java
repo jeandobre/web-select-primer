@@ -28,18 +28,43 @@ public class Application extends Controller {
         render();
     }
 
+    public static void erro(){
+        validation.keep();
+        render();
+    }
+
+    public static void result(Parametros parametro, Arquivo alfa, Arquivo beta, Integer i, String programa){
+        re = Resultado.computaResultado(localSaida + "/out");
+        Integer j = re.get(0).j;
+        Ocorrencia ocr = new Ocorrencia(i, i + re.size(), re.size());
+        Integer k = parametro.k;
+
+        Resultado maior = null;
+        Resultado menor = null;
+
+        if(parametro.maiorMenor){
+            maior = re.get(0);
+            menor = re.get(0);
+           for(Resultado rr: re){
+             if(rr.tamanho > maior.tamanho) maior = rr;
+             if(rr.tamanho < menor.tamanho) menor = rr;
+           }
+        }
+
+        render(alfa, beta, programa, ocr, k, j, maior, menor);
+    }
+
     public static void process(Parametros parametro){
         if(validation.hasErrors()) {
-            validation.keep();
-            render("/");
             validation.valid(parametro);
+            erro();
         } else {
             Boolean fasta = (ConvertFASTA2txt.converter(parametro.alfa, localEntrada + parametro.alfa.getName()));
             Arquivo alfa = ValidCharDNA.validar(localEntrada + parametro.alfa.getName());
             alfa.fasta = fasta;
 
-            fasta = (ConvertFASTA2txt.converter(parametro.beta, localEntrada + parametro.beta.getName()));
-            Arquivo beta = ValidCharDNA.validar(localEntrada + parametro.beta.getName());
+            fasta = (ConvertFASTA2txt.converter(parametro.beta.get(0), localEntrada + parametro.beta.get(0).getName()));
+            Arquivo beta = ValidCharDNA.validar(localEntrada + parametro.beta.get(0).getName());
             beta.fasta = fasta;
 
             if (alfa.quantidadeCaracteres < parametro.k) {
@@ -48,10 +73,10 @@ public class Application extends Controller {
 
             if (!parametro.tipoProcessamento) {
                 if (parametro.j == parametro.distancia) { //se o j for igual a distancia esta errado
-                    // validation.error("Erro", "O valor de j não pode ser igual à distância!");
+                     //validation.error("Erro", "O valor de j não pode ser igual à distância!");
                 }
                 if (parametro.j > alfa.quantidadeCaracteres) { //se
-                    //  validation.("Erro", "O valor de j deve estar no intervalo entre 0 e o tamanho de alfa!");
+                     //validation.error("Erro", "O valor de j deve estar no intervalo entre 0 e o tamanho de alfa!");
                 }
 
             }
@@ -83,15 +108,11 @@ public class Application extends Controller {
 
             if (validation.hasErrors()) {
                 validation.keep();
-                render("/");
+                erro();
             } else {
 
                 execCommand(commandLine);
-                re = Resultado.computaResultado(localSaida + "/out");
-                Integer j = re.get(0).j;
-                Ocorrencia ocr = new Ocorrencia(i, i + re.size(), re.size());
-                Integer k = parametro.k;
-                render(alfa, beta, programa, ocr, k, j);
+                result(parametro, alfa, beta, i, programa);
             }
         }
     }

@@ -89,7 +89,7 @@
    margin: 10px;
 }
 
-#mouse{
+#maior, #menor, #mouse{
   background-color: #337ab7;
   padding: 0px;
   height: 10px;
@@ -110,4 +110,18 @@
     filter: alpha(opacity=65);
     background: black;
     text-align: center;
+}
+
+#prime{
+   word-break: break-all;
+   font-size: 12px;
+   font-weight: normal;
+}
+
+#maior{
+  background-color: #d9534f;
+}
+
+#menor{
+  background-color: #5cb85c;
 }
