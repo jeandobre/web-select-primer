@@ -8,16 +8,16 @@
 
     <div class="panel">
         <label class="label label-default">Programa:</label>
-        <span>${programa}</span>
+        <span>${resultado.programa}</span>
     </div>
     <div class="panel">
         <label class="label label-primary">Sequência alvo:</label>
-        <span>${alfa.nome}</span>
-        #{if (alfa.fasta)} <label class="label label-info">FASTA</label> #{/if}
+        <span>${resultado.alfa.nome}</span>
+        #{if (resultado.alfa.fasta)} <label class="label label-info">FASTA</label> #{/if}
     </div>
     <div class="panel">
         <label class="label label-primary">Quantidade de caracteres:</label>
-        <span>${alfa.quantidadeCaracteres}</span>
+        <span>${resultado.alfa.quantidadeCaracteres}</span>
     </div>
 
     <div class="bloco">
@@ -25,8 +25,8 @@
         <div id="maior" class="bordas"></div>
         <div id="menor" class="bordas"></div>
         <div id="mouse" class="bordas"></div>
-        <div class="fundo-sequencia" style="width: ${alfa.quantidadeCaracteres}px">
-            <div class="sequencia" style="margin-left: ${ocr.inicio}px;width: ${ocr.quantidade}px"></div>
+        <div class="fundo-sequencia" style="width: ${resultado.alfa.quantidadeCaracteres}px">
+            <div class="sequencia" style="margin-left: ${resultado.ocr.inicio}px;width: ${resultado.ocr.quantidade}px"></div>
         </div>
 
       <div id="bordas-left" class="bordas"></div>
@@ -38,21 +38,29 @@
 
 
       <div class="margem-10">
-          <span class="badge">${ocr.quantidade}</span> <a href="#" class="testlink">ocorrências</a>
-          <span>com ${k} diferenças em relação à qualquer segmento da sequencia </span>
-          <span class="label label-info">${beta.nome}</span>
+          <span class="badge">${resultado.ocr.quantidade}</span> <a href="#" class="testlink">ocorrências</a>
+          <span>com ${resultado.k} diferenças em relação à qualquer segmento da(s) sequencia(s):</span>
+
+          <ul class="list-group" style="margin-top: 10px">
+          #{list items:resultado.betas, as:'b'}
+          <li class="list-group-item">${b.nome}
+              #{if (resultado.alfa.fasta)} <label class="label label-info">FASTA</label> #{/if}
+              <span class="badge">${b.quantidadeCaracteres}</span></li>
+          #{/list}
+          </ul>
+
       </div>
 
-      #{if maior != null && menor != null }
+      #{if resultado.maiorMenor == true }
       <div class="margem-10">
           <div>
               <span class="label label-danger">Maior segmento:</span>
-              <span>posição ${maior.j} com tamanho ${maior.tamanho}</span>
+              <span>posição ${resultado.maior.j} com tamanho ${resultado.maior.tamanho}</span>
           </div>
 
           <div style="margin-top: 5px;">
               <span class="label label-success">Menor segmento:</span>
-              <span>posição ${menor.j} com tamanho ${menor.tamanho}</span>
+              <span>posição ${resultado.menor.j} com tamanho ${resultado.menor.tamanho}</span>
           </div>
       </div>
       #{/if}
@@ -99,6 +107,8 @@
 
 $( document ).ready(function() {
     $("#mouse").hide();
+    $("#maior").hide();
+    $("#menor").hide();
 
     $( ".sequencia" )
         .hover( function() {$("#mouse").show();}, function() {/* $("#mouse").hide(); */})
@@ -120,13 +130,14 @@ $( document ).ready(function() {
 
         });
 
-    processa(${j});
-    $("#maior").hide();
-    $("#menor").hide();
+    processa(${resultado.j});
 
-    #{if maior != null && menor != null }
-        $("#maior").css("left", ${maior.j + 16});
-        $("#menor").css("left", ${menor.j + 16});
+
+    #{if resultado.maiorMenor == true }
+        $("#maior").css("left", ${resultado.maior.j + 16});
+        $("#menor").css("left", ${resultado.menor.j + 16});
+        $("#maior").show();
+        $("#menor").show();
     #{/if}
 });
 </script>

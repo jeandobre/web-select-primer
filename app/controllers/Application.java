@@ -3,12 +3,15 @@ package controllers;
 import play.*;
 import play.mvc.*;
 //import play.data.Upload;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import play.data.validation.Valid;
+import play.cache.Cache;
+
+import javax.xml.transform.Result;
+
 //import java.io.FileInputStream;
 
 //import models.*;
@@ -23,10 +26,10 @@ public class Application extends Controller {
     public static final String localEntrada = Play.configuration.getProperty("diretorio.entrada");
     public static final String localSaida = Play.configuration.getProperty("diretorio.saida");
 
-    public static List<Resultado> re;
+    public static List<CandidatoPrimer> re;
 
     public static void index() {
-        re = null;
+        Cache.clear();
         render();
     }
 
@@ -35,46 +38,68 @@ public class Application extends Controller {
         render();
     }
 
-    public static void result(Parametros parametro, Arquivo alfa, Arquivo beta, Integer i, String programa){
-        re = Resultado.computaResultado(localSaida + "/out");
-        Integer j = re.get(0).j;
-        Ocorrencia ocr = new Ocorrencia(i, i + re.size(), re.size());
-        Integer k = parametro.k;
+    public static void result(){
 
-        Resultado maior = null;
-        Resultado menor = null;
+        Resultado resultado = (Resultado) Cache.get( session.getId() );
 
-        if(parametro.maiorMenor){
-            maior = re.get(0);
-            menor = re.get(0);
-           for(Resultado rr: re){
-             if(rr.tamanho > maior.tamanho) maior = rr;
-             if(rr.tamanho < menor.tamanho) menor = rr;
-           }
+        for(ArquivoBeta beta: resultado.betas){
+            beta.candidatos = CandidatoPrimer.computaResultado(beta.local);
+            Integer i = beta.candidatos.get(0).j;
+            Integer tamanho = beta.candidatos.size();
+            beta.ocr = new Ocorrencia(i, i + tamanho, tamanho);
+            beta.setMaiorMenorPorBeta();
         }
 
-        render(alfa, beta, programa, ocr, k, j, maior, menor);
+        //TODO agora aki gero a lista de resultados
+        re = new ArrayList<CandidatoPrimer>();
+        Boolean temLinha = true;
+        Integer linha = 0;
+        while(temLinha){
+            CandidatoPrimer cp = resultado.maiorPorLinha(linha);
+            if(cp != null){
+                re.add(cp);
+                linha++;
+            } else {
+                temLinha = false;
+            }
+        }
+        resultado.candidatos = re;
+        Integer i = re.get(0).j;
+        Integer tamanho = re.size();
+        resultado.ocr = new Ocorrencia(i, i + tamanho, tamanho);
+        resultado.j = i;
+        resultado.setMaiorMenor();
+
+        render(resultado);
     }
 
     public static void process(@Valid Parametros parametro){
-
-
 
         if(validation.hasErrors()) {
             validation.keep();
             erro();
         } else {
-            Boolean fasta = (ConvertFASTA2txt.converter(parametro.alfa, localEntrada + parametro.alfa.getName()));
-            Arquivo alfa = ValidCharDNA.validar(localEntrada + parametro.alfa.getName());
+            Boolean fasta = (ConvertFASTA2txt.converter(parametro.alfa, localEntrada + "/" + parametro.alfa.getName()));
+            Arquivo alfa = ValidCharDNA.validar(localEntrada + "/" + parametro.alfa.getName());
             alfa.fasta = fasta;
-            Arquivo beta = new Arquivo();
+            List<ArquivoBeta> betas = new ArrayList<ArquivoBeta>();
 
-            if(parametro.beta.get(0) == null || parametro.beta == null || parametro.beta.isEmpty()){
+            if( parametro.beta == null ){
                 validation.addError("Erro", "É necessário adicionar uma ou mais sequências para o processamento!");
             } else {
-                fasta = (ConvertFASTA2txt.converter(parametro.beta.get(0), localEntrada + parametro.beta.get(0).getName()));
-                beta = ValidCharDNA.validar(localEntrada + parametro.beta.get(0).getName());
-                beta.fasta = fasta;
+                for(File f: parametro.beta) {
+                    System.out.println(f.getName());
+                    fasta = (ConvertFASTA2txt.converter(f, localEntrada + "/" + f.getName()));
+                    Arquivo bt = ValidCharDNA.validar(localEntrada + "/" + f.getName());
+                    ArquivoBeta beta = new ArquivoBeta();
+                    beta.nome = bt.nome;
+                    beta.quantidadeCaracteres = bt.quantidadeCaracteres;
+                    beta.sequencia = bt.sequencia;
+                    beta.fasta = fasta;
+                    betas.add( beta );
+
+                    bt = null;
+                }
             }
 
             if (alfa.quantidadeCaracteres < parametro.k) {
@@ -109,9 +134,7 @@ public class Application extends Controller {
                 }
 
                 commandLine += " -a " + alfa.nome;
-                commandLine += " -b " + beta.nome;
                 commandLine += " -k " + parametro.k;
-                commandLine += " -sf " + localSaida + "/out";
                 Integer i = 0;
 
                 if (!parametro.tipoProcessamento) {
@@ -119,8 +142,24 @@ public class Application extends Controller {
                     i = parametro.j;
                 }
 
-                execCommand(commandLine);
-                result(parametro, alfa, beta, i, programa);
+                Integer saida = 1;
+                for(Arquivo beta: betas){
+                    beta.local = localSaida + "/out_" + session.getId() + "_" + saida;
+                    String argumento = " -b " + beta.nome + " -sf " + beta.local;
+                    //System.out.println(commandLine + argumento);
+
+                    execCommand(commandLine + argumento);
+                    saida++;
+                }
+
+                Resultado resultado = new Resultado(alfa, betas, i, programa);
+                resultado.k = parametro.k;
+                resultado.j = parametro.j;
+                resultado.maiorMenor = parametro.maiorMenor;
+
+                Cache.add(session.getId(), resultado);
+
+                result();
             }
         }
     }
@@ -142,7 +181,7 @@ public class Application extends Controller {
     public static void posicao(int j){
         Integer inicio = re.get(0).j;
         inicio = j - inicio;
-        Resultado r = re.get(inicio);
+        CandidatoPrimer r = re.get(inicio);
         render(r);
     }
 

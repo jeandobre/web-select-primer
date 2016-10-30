@@ -1,42 +1,59 @@
 package controllers;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.List;
 
 /**
- * Created by jeandobre on 14/10/2016.
+ * Created by jeandobre on 27/10/16.
  */
-public class Resultado {
-    public Integer j;
-    public Integer tamanho;
-    public String sequencia;
+public class Resultado implements Serializable {
 
-    static public List<Resultado> computaResultado(String file){
-        List<Resultado> resultados = new ArrayList<Resultado>();
-        try{
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            int count = 0;
-            while(br.ready()){
-                String linha = br.readLine();
-                if(count == 0){
-                    count++;
-                    continue;
-                }
-                Resultado r = new Resultado();
-                String gg[] = linha.split(";");
-                r.j = Integer.valueOf( gg[0] );
-                r.tamanho = Integer.valueOf( gg[1] );
-                r.sequencia = gg[2];
-                resultados.add(r);
+    Arquivo alfa;
+    List<ArquivoBeta> betas;
+
+    Integer k;
+    Integer i;
+    Integer j;
+
+    String programa;
+
+    Ocorrencia ocr;
+
+    List<CandidatoPrimer> candidatos;
+
+    CandidatoPrimer maior;
+    CandidatoPrimer menor;
+
+    Boolean maiorMenor;
+
+    public Resultado(Arquivo alfa, List<ArquivoBeta> betas, Integer i, String programa) {
+        this.alfa = alfa;
+        this.betas = betas;
+        this.i = i;
+        this.programa = programa;
+    }
+
+    public CandidatoPrimer maiorPorLinha(Integer linha){
+        Integer valor = 0;
+        CandidatoPrimer maior = null;
+        for (ArquivoBeta beta : betas){
+            if(linha + 1 > beta.candidatos.size()) return null;
+
+            if(beta.candidatos.get(linha).tamanho > valor){
+                valor = beta.candidatos.get(linha).tamanho;
+                maior = beta.candidatos.get(linha);
             }
-            br.close();
-            // return True;
-        }catch(IOException ioe) {
-            ioe.printStackTrace();
         }
-        return resultados;
+
+        return maior;
+    }
+
+    public void setMaiorMenor(){
+        maior = candidatos.get(0);
+        menor = candidatos.get(0);
+        for (CandidatoPrimer rr : candidatos) {
+            if (rr.tamanho > maior.tamanho) maior = rr;
+            if (rr.tamanho < menor.tamanho) menor = rr;
+        }
     }
 }

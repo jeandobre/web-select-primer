@@ -15,7 +15,7 @@ public class Parametros{
 
    @Required
    @NotNull
-   public List<File> beta;
+   public File[] beta;
 
    @Required
    @Min(1)
