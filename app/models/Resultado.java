@@ -1,31 +1,22 @@
-package controllers;
+package models;
 
 import java.io.Serializable;
-import java.util.List;
+import javax.persistence.Entity;
 
 /**
  * Created by jeandobre on 27/10/16.
  */
-public class Resultado implements Serializable {
+@Entity
+@Table(name="resultados", schema="public")
+public class Resultado extends Model {
 
-    Arquivo alfa;
-    List<ArquivoBeta> betas;
+    @Id
+    @GeneratedValue
+    public Long id;
 
-    Integer k;
-    Integer i;
-    Integer j;
 
-    String programa;
 
-    Ocorrencia ocr;
-
-    List<CandidatoPrimer> candidatos;
-
-    CandidatoPrimer maior;
-    CandidatoPrimer menor;
-
-    Boolean maiorMenor;
-
+    /*
     public Resultado(Arquivo alfa, List<ArquivoBeta> betas, Integer i, String programa) {
         this.alfa = alfa;
         this.betas = betas;
@@ -56,4 +47,5 @@ public class Resultado implements Serializable {
             if (rr.tamanho < menor.tamanho) menor = rr;
         }
     }
+    */
 }

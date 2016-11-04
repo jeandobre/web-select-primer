@@ -1,11 +1,32 @@
-package controllers;
+package models;
+
+import controllers.Arquivo;
+import controllers.CandidatoPrimer;
+import controllers.Ocorrencia;
 
 import java.util.List;
 
 /**
  * Created by jeandobre on 29/10/16.
  */
-public class ArquivoBeta extends Arquivo {
+@Entity
+@Table(name="betas", schema="public")
+public class ArquivoBeta extends Model {
+
+    @Id
+    @GeneratedValue
+    public Long id;
+
+    @ManyToOne
+    public Processamento processamento;
+
+    public String nome;
+
+    public String arquivo;
+
+    public String tamanho;
+
+    /*
 
     public Ocorrencia ocr;
     public CandidatoPrimer maior;
@@ -21,4 +42,6 @@ public class ArquivoBeta extends Arquivo {
             if (rr.tamanho < menor.tamanho) menor = rr;
         }
     }
+
+    */
 }

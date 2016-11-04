@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>alfa: CCCGGCCC, beta: CCCGTGCCC, k = 1</div>
+<canvas id="grafico" style="border: 1px solid #ccc;"></canvas>
+
+</body>
+<script>
+    //cada 10 px é uma casa
+    var c=document.getElementById("grafico");
+    var ctx=c.getContext("2d");
+    ctx.beginPath();
+    ctx.strokeStyle="#CCC";
+   // ctx.stroke();
+
+    var n = 9;
+    for (l = 0; l <= n; l++) {
+       ctx.moveTo((l + 1) * 10,0);  //x y
+       ctx.lineTo((l + 1) * 10, 150);
+    }
+
+    var m = 8;
+    for (i = 0; i <= m; i++) {
+       ctx.moveTo(0, (i + 1) * 10);  //x y
+       ctx.lineTo(300, (i + 1) * 10 );
+    }
+
+    // ctx.strokeStyle="#f1f1f1";
+    #{list items:lista, as:'lst'}
+        ctx.moveTo(${lst.i} * 10, ${lst.j} * 10);
+        ctx.lineTo((${lst.i} * 10) + (${lst.lce} * 10), (${lst.j} * 10) + (${lst.lce} * 10));
+    #{/list}
+    ctx.stroke();
+
+</script>
+
+</html>

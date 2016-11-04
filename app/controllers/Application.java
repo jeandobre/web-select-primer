@@ -1,5 +1,7 @@
 package controllers;
 
+import models.ArquivoBeta;
+import models.Resultado;
 import play.*;
 import play.mvc.*;
 //import play.data.Upload;
@@ -9,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import play.data.validation.Valid;
 import play.cache.Cache;
-
-import javax.xml.transform.Result;
 
 //import java.io.FileInputStream;
 
@@ -183,6 +183,23 @@ public class Application extends Controller {
         inicio = j - inicio;
         CandidatoPrimer r = re.get(inicio);
         render(r);
+    }
+
+    public static void diagonal(){
+        List<LCE> lista = new ArrayList<LCE>();
+        String alfa = "CCCGGCCC";
+        String beta = "CCCGTGCCC";
+
+        for(Integer i = 0; i < alfa.length() - 1; i++){
+            for(Integer j = 0; j < beta.length() - 1; j++){
+                Integer lce = LCE.lce(alfa.toCharArray(), beta.toCharArray(), i, j);
+                if(lce > 1){
+                    lista.add(new LCE(i, j, lce));
+                }
+            }
+        }
+
+        render(lista);
     }
 
 }
