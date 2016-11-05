@@ -53,4 +53,7 @@ public class Processamento extends Model {
     public String nome;
 
     public String informacao;
+
+    @OneToMany
+    public List<ArquivoBeta> betas;
 }
