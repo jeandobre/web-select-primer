@@ -1,7 +1,12 @@
 package models;
 
+import play.db.jpa.Model;
+
 import java.io.Serializable;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Created by jeandobre on 27/10/16.

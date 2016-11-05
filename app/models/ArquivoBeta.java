@@ -3,7 +3,9 @@ package models;
 import controllers.Arquivo;
 import controllers.CandidatoPrimer;
 import controllers.Ocorrencia;
+import play.db.jpa.Model;
 
+import javax.persistence.*;
 import java.util.List;
 
 /**
