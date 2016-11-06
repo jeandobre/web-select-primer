@@ -1,6 +1,6 @@
 package models;
 
-import play.db.jpa.Model;
+import play.db.jpa.GenericModel;
 
 import javax.persistence.*;
 
@@ -9,13 +9,14 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "maiores", schema = "public")
-public class Maior extends Model {
+public class Maior extends GenericModel {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     public Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "resultado_id")
+    @JoinColumn(name = "resultado_id", referencedColumnName="id", nullable=false)
     public Resultado resultado;
 }

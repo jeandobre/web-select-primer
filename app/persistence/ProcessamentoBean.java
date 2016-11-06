@@ -4,10 +4,10 @@ import controllers.Arquivo;
 import controllers.CandidatoPrimer;
 import controllers.Parametros;
 import models.*;
-import play.Play;
-import play.cache.Cache;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import play.db.jpa.JPA;
 import play.*;
-import play.mvc.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,6 +18,9 @@ import java.util.List;
  * Created by jeandobre on 05/11/2016.
  */
 public class ProcessamentoBean {
+
+    private EntityManager em = JPA.em();
+    //private EntityTransaction tx = JPA.em().getTransaction();
 
     public static final String sequenciaParecida =  Play.configuration.getProperty("sequencia.parecida");
     public static final String sequenciaDiferente = Play.configuration.getProperty("sequencia.diferente");

@@ -13,7 +13,8 @@ import java.util.List;
 public class ArquivoBeta extends Model {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

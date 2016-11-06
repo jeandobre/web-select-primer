@@ -1,6 +1,6 @@
 package models;
 
-import play.db.jpa.Model;
+import play.db.jpa.GenericModel;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,10 +12,11 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="processamentos", schema="public")
-public class Processamento extends Model {
+public class Processamento extends GenericModel {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
     public Long id;
 
     @Temporal(TemporalType.DATE)
@@ -45,17 +46,22 @@ public class Processamento extends Model {
     @Column(name="mostrar_entre_mil_dois_mil")
     public Boolean mostrarEntreMilDoisMil;
 
+    @Column
     public Integer posicao;
 
+    @Column
     public Integer distancia;
 
+    @Column
     public String processamento;
 
+    @Column
     public String nome;
 
+    @Column
     public String informacao;
 
-    @OneToMany(cascade = CascadeType.ALL , fetch = FetchType.LAZY, mappedBy = "processamento")
+    @OneToMany(cascade = CascadeType.ALL , fetch = FetchType.LAZY, mappedBy = "processamento", orphanRemoval=true)
     public List<ArquivoBeta> betas;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "processamento")

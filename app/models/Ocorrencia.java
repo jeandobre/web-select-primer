@@ -1,6 +1,6 @@
 package models;
 
-import play.db.jpa.Model;
+import play.db.jpa.GenericModel;
 
 import javax.persistence.*;
 
@@ -9,10 +9,11 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="ocorrencias", schema="public")
-public class Ocorrencia extends Model {
+public class Ocorrencia extends GenericModel {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
