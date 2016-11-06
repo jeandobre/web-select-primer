@@ -3,10 +3,7 @@ package models;
 import play.db.jpa.Model;
 
 import java.io.Serializable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by jeandobre on 27/10/16.
@@ -19,38 +16,22 @@ public class Resultado extends Model {
     @GeneratedValue
     public Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "processamento_id")
+    public Processamento processamento;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ocorrencia_id")
+    public Ocorrencia ocorrencia;
 
-    /*
-    public Resultado(Arquivo alfa, List<ArquivoBeta> betas, Integer i, String programa) {
-        this.alfa = alfa;
-        this.betas = betas;
-        this.i = i;
-        this.programa = programa;
+    public Boolean isMenor(){
+       //TODO
+        return Boolean.FALSE;
     }
 
-    public CandidatoPrimer maiorPorLinha(Integer linha){
-        Integer valor = 0;
-        CandidatoPrimer maior = null;
-        for (ArquivoBeta beta : betas){
-            if(linha + 1 > beta.candidatos.size()) return null;
-
-            if(beta.candidatos.get(linha).tamanho > valor){
-                valor = beta.candidatos.get(linha).tamanho;
-                maior = beta.candidatos.get(linha);
-            }
-        }
-
-        return maior;
+    public Boolean isMaior(){
+       //TODO
+        return Boolean.FALSE;
     }
 
-    public void setMaiorMenor(){
-        maior = candidatos.get(0);
-        menor = candidatos.get(0);
-        for (CandidatoPrimer rr : candidatos) {
-            if (rr.tamanho > maior.tamanho) maior = rr;
-            if (rr.tamanho < menor.tamanho) menor = rr;
-        }
-    }
-    */
 }

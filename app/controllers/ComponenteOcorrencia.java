@@ -1,14 +1,15 @@
 package controllers;
 
 /**
- * Created by jeandobre on 20/10/16.
+ * Created by jeandobre on 05/11/2016.
  */
-public class Ocorrencia {
+public class ComponenteOcorrencia {
+
     public Integer inicio;
     public Integer fim;
     public Integer quantidade;
 
-    public Ocorrencia(Integer inicio, Integer fim, Integer quantidade) {
+    public ComponenteOcorrencia(Integer inicio, Integer fim, Integer quantidade) {
         this.inicio = inicio;
         this.fim = fim;
         this.quantidade = quantidade;

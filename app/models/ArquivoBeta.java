@@ -1,8 +1,5 @@
 package models;
 
-import controllers.Arquivo;
-import controllers.CandidatoPrimer;
-import controllers.Ocorrencia;
 import play.db.jpa.Model;
 
 import javax.persistence.*;
@@ -19,14 +16,18 @@ public class ArquivoBeta extends Model {
     @GeneratedValue
     public Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "processamento_id")
     public Processamento processamento;
 
     public String nome;
 
     public String arquivo;
 
-    public String tamanho;
+    public Integer tamanho;
+
+    @OneToMany(cascade = CascadeType.ALL , fetch = FetchType.LAZY, mappedBy = "beta")
+    public List<Ocorrencia> ocorrencias;
 
     /*
 

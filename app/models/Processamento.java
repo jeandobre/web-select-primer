@@ -4,6 +4,7 @@ import play.db.jpa.Model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.*;
 
 /**
@@ -54,6 +55,25 @@ public class Processamento extends Model {
 
     public String informacao;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL , fetch = FetchType.LAZY, mappedBy = "processamento")
     public List<ArquivoBeta> betas;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "processamento")
+    public List<Resultado> resultados;
+
+
+    public Ocorrencia maiorPorPosicao(Integer posicao){
+        Ocorrencia maior = null;
+        Integer valor = 0;
+        for (ArquivoBeta beta : betas){
+            if(posicao + 1 > beta.ocorrencias.size()) return null;
+
+            if(beta.ocorrencias.get(posicao).r > valor){
+                valor = beta.ocorrencias.get(posicao).r;
+                maior = beta.ocorrencias.get(posicao);
+            }
+        }
+
+        return maior;
+    }
 }
