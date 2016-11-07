@@ -1,6 +1,6 @@
 package models;
 
-import play.db.jpa.GenericModel;
+import play.db.jpa.Model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,7 +12,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="processamentos", schema="public")
-public class Processamento extends GenericModel {
+public class Processamento extends Model {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

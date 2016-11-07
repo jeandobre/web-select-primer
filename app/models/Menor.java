@@ -1,6 +1,6 @@
 package models;
 
-import play.db.jpa.GenericModel;
+import play.db.jpa.Model;
 
 import javax.persistence.*;
 import javax.xml.transform.Result;
@@ -10,7 +10,7 @@ import javax.xml.transform.Result;
  */
 @Entity
 @Table(name = "menores", schema = "public")
-public class Menor extends GenericModel {
+public class Menor extends Model {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

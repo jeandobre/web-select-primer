@@ -1,6 +1,6 @@
 package models;
 
-import play.db.jpa.GenericModel;
+import play.db.jpa.Model;
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -10,29 +10,24 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="resultados", schema="public")
-public class Resultado extends GenericModel {
+public class Resultado extends Model {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column
     public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "processamento_id")
+    @JoinColumn(name = "processamento_id", referencedColumnName="id")
     public Processamento processamento;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ocorrencia_id")
+    @JoinColumn(name = "ocorrencia_id", referencedColumnName="id")
     public Ocorrencia ocorrencia;
 
-  /*  public Boolean isMenor(){
-       //TODO
-        return Boolean.FALSE;
-    }
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "ocorrencia")
+    public Maior maior;
 
-    public Boolean isMaior(){
-       //TODO
-        return Boolean.FALSE;
-    }
-*/
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "ocorrencia")
+    public Menor menor;
 }

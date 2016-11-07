@@ -14,17 +14,20 @@ public class ArquivoBeta extends Model {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column
     public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "processamento_id")
+    @JoinColumn(name = "processamento_id", referencedColumnName="id")
     public Processamento processamento;
 
+    @Column
     public String nome;
 
+    @Column
     public String arquivo;
 
+    @Column
     public Integer tamanho;
 
     @OneToMany(cascade = CascadeType.ALL , fetch = FetchType.LAZY, mappedBy = "beta")
