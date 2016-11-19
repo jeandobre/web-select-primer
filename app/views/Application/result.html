@@ -1,66 +1,99 @@
 #{extends 'main.html' /}
-#{set title:'Web Primers [Processando]' /}
+#{set title:'Web Primers [Resultado]' /}
+#{set pagina:'Resultado do processamento ' + processamento.id /}
 
-  <div class="container-fluid">
-    <div class="page-header">
-        <h1>Web <small>Sistema de seleção de regiões específicas</small></h1>
-    </div>
+#{set 'controles'}
+    <a id="novo" class="btn btn-primary" href="/">Novo processamento</a>
+    #{if processamento.salvo == false}
+        <a id="salvar" class="btn btn-success" href="/processamento/salvar/${processamento.id}">Guardar resultado</a>
+    #{/if}
+
+    #{if processamento.salvo == true}
+        <a id="recuperar" class="btn btn-default" href="/processamento">Recuperar resultado</a>
+    #{/if}
+
+#{/set}
 
     <div class="panel">
+        <label class="label label-default">Diferenças:</label>
+        <span>${processamento.quantidadeDiferencas}</span>
+
+        <label class="label label-default">Tipo de sequência:</label>
+        <span>${processamento.tipoSequencia}</span>
+
         <label class="label label-default">Programa:</label>
-        <span>${resultado.programa}</span>
+        <span>${processamento.programa.nome}</span>
+
+        <!--<div class="info-nome">${processamento.nome}</div>-->
     </div>
+
     <div class="panel">
-        <label class="label label-primary">Sequência alvo:</label>
-        <span>${resultado.alfa.nome}</span>
-        #{if (resultado.alfa.fasta)} <label class="label label-info">FASTA</label> #{/if}
+        <label class="label label-default">Inicio:</label>
+        <span>${processamento.inicio?.format('dd/MM/yyyy hh:mm')}</span>
+
+        <label class="label label-default">Fim:</label>
+        <span>${processamento.fim?.format('dd/MM/yyyy hh:mm')}</span>
+
+        <label class="label label-default">Tempo de processamento:</label>
+        <span>${processamento.tempoGasto} segundo(s)</span>
     </div>
-    <div class="panel">
-        <label class="label label-primary">Quantidade de caracteres:</label>
-        <span>${resultado.alfa.quantidadeCaracteres}</span>
+
+    <div class="sequencia-alfa-bloco">
+        <label class="label label-primary" style="padding: 5px;">Sequência alvo:</label>
+        <span class="alfa-nome">${processamento.alfaNome}</span>
+        <span class="alfa-tamanho">${processamento.alfaTamanho} caracteres</span>
+    </div>
+
+    <div class="zoom">
+        <a href="#" id="min" title="Clique aqui para diminuir o zoom">
+            <span class="glyphicon glyphicon-minus"></span>
+        </a>
+
+        <span class="glyphicon" id="valor" data-dst="0">100%</span>
+
+        <a href="#" id="plus" title="Clique aqui para aumentar o zoom">
+            <span class="glyphicon glyphicon-plus"></span>
+        </a>
     </div>
 
     <div class="bloco">
       <span id="j"></span>
-        <div id="maior" class="bordas"></div>
-        <div id="menor" class="bordas"></div>
-        <div id="mouse" class="bordas"></div>
-        <div class="fundo-sequencia" style="width: ${resultado.alfa.quantidadeCaracteres}px">
-            <div class="sequencia" style="margin-left: ${resultado.ocr.inicio}px;width: ${resultado.ocr.quantidade}px"></div>
-        </div>
-
-      <div id="bordas-left" class="bordas"></div>
-      <div id="bordas-right" class="bordas"></div>
-      <div id="ocorrencia" class="ocorrencia"></div>
-      <span id="r"></span>
-
-    </div>
-
-
-      <div class="margem-10">
-          <span class="badge">${resultado.ocr.quantidade}</span> <a href="#" class="testlink">ocorrências</a>
-          <span>com ${resultado.k} diferenças em relação à qualquer segmento da(s) sequencia(s):</span>
-
-          <ul class="list-group" style="margin-top: 10px">
-          #{list items:resultado.betas, as:'b'}
-          <li class="list-group-item">${b.nome}
-              #{if (resultado.alfa.fasta)} <label class="label label-info">FASTA</label> #{/if}
-              <span class="badge">${b.quantidadeCaracteres}</span></li>
-          #{/list}
-          </ul>
+      <div id="foo" style="width: ${processamento.alfaTamanho}px">
 
       </div>
 
-      #{if resultado.maiorMenor == true }
+      <div class="fundo-sequencia" style="width: ${processamento.alfaTamanho}px">
+         #{list items:resultados, as:'rs'}
+            <div class="sequencia" #{if rs_isFirst} style="margin-left: ${rs.ocorrencia.j}px;" #{/if} ></div>
+         #{/list}
+      </div>
+
+      <div id="ocorrencia" class="ocorrencia"></div>
+      <span id="r"></span>
+    </div>
+
+      #{if processamento.mostrarMaiorMenor == true }
       <div class="margem-10">
           <div>
-              <span class="label label-danger">Maior segmento:</span>
-              <span>posição ${resultado.maior.j} com tamanho ${resultado.maior.tamanho}</span>
+              <span class="label label-danger" style="padding: 6px">Maior segmento, com tamanho
+                  <label class="badge">${processamento.maiorTamanho}</label>
+              </span>
+              <span>posição:
+                  #{list items:maiores, as:'rs'}
+                      <a class="link-ocorrencia" data-j="${rs.ocorrencia.j}">${rs.ocorrencia.j}</a>
+                  #{/list}
+              </span>
           </div>
 
           <div style="margin-top: 5px;">
-              <span class="label label-success">Menor segmento:</span>
-              <span>posição ${resultado.menor.j} com tamanho ${resultado.menor.tamanho}</span>
+              <span class="label label-success" style="padding: 6px">Menor segmento, com tamanho
+                  <label class="badge">${processamento.menorTamanho}</label>
+              </span>
+              <span>posição:
+                  #{list items:menores, as:'rs'}
+                      <a class="link-ocorrencia" data-j="${rs.ocorrencia.j}">${rs.ocorrencia.j}</a>
+                  #{/list}
+              </span>
           </div>
       </div>
       #{/if}
@@ -74,16 +107,27 @@
           </div>
       </div>
 
-      <div class="pull-right">
-          <a id="novo" class="btn btn-primary" href="/">Novo processamento</a>
-          <buttom id="salvar" class="btn btn-success" type="buttom">Guardar resultado</buttom>
-      </div>
+<div class="margem-10">
+    Encontrado
+    <span class="badge">${ocr.quantidade}</span>
+    <a href="/processamento/${processamento.id}/resultado" class="testlink" >ocorrências</a>
+    <span>com ${processamento.quantidadeDiferencas} diferenças em relação à qualquer segmento da(s) sequencia(s):</span>
 
-  </div>
+    <ul class="list-group" style="margin-top: 10px">
+        #{list items:processamento.betas, as:'b'}
+        <li class="list-group-item">
+            <span class="beta-nome">${b.nome}</span>
+            <span class="beta-tamanho">${b.tamanho} caracteres</span>
+            <a class="testlink" href="/processamento/beta/${b.id}" style="float: right; margin-left:5px">ocorrências</a>
+            <span class="badge">${b.totalOcorrencias}</span>
+        </li>
+        #{/list}
+    </ul>
+</div>
 
 <script>
-  function processa(j){
-       $.getJSON( "/posicao/" + j, function( data ) {
+  function processa(id, j){
+       $.getJSON( "/posicao/" + id + "/" + j, function( data ) {
            var r = data.tamanho;
            var t = (j + (r - 6) );
 
@@ -106,38 +150,45 @@
   }
 
 $( document ).ready(function() {
-    $("#mouse").hide();
-    $("#maior").hide();
-    $("#menor").hide();
+
+    $("#recuperar, .testlink, #salvar").click(function(){
+       $('.div-ajax-carregamento-pagina').show();
+    });
+
+    $("#plus").click(function(){
+       $(".zoom").css("margin-right", "10px")
+       $("#valor").html('200%');
+
+       $(".bloco").animate({ 'zoom': 2.0 }, 400);
+    });
+
+    $("#min").click(function(){
+       $(".zoom").css("margin-right", "5px")
+       $("#valor").html('100%');
+       $(".bloco").animate({ 'zoom': 1.0 }, 400);
+    });
 
     $( ".sequencia" )
-        .hover( function() {$("#mouse").show();}, function() {/* $("#mouse").hide(); */})
-
-        .mousemove( function( event ) {
-           var j = event.pageX - 1;
-           //var position = $(".sequencia").position();
-           //j = j + Math.trunc(position.left) * -1;
-           $("#mouse").css("left", j);
-        })
         .click( function( event ) {
-           var j = event.pageX - 1;
-           //$(".testlink").html(j);
-
-           var position = $(".sequencia").position();
-           j = j + Math.trunc(position.left) * -1;
-           //  alert(j);
-           processa(j);
-
+           var position = $(this).offset();
+           var j = Math.trunc(position.left) - 6;
+           processa(${processamento.id}, j);
         });
 
-    processa(${resultado.j});
+    processa(${processamento.id}, ${ocr.inicio});
 
+    #{if processamento.mostrarMaiorMenor == true }
+        #{list items:maiores, as:'rs'}
+          $("#foo").append("<a class='link-ocorrencia' data-j='${rs.ocorrencia.j}'><div class='maior' style='left: ${rs.ocorrencia.j}px'></div></a>");
 
-    #{if resultado.maiorMenor == true }
-        $("#maior").css("left", ${resultado.maior.j + 16});
-        $("#menor").css("left", ${resultado.menor.j + 16});
-        $("#maior").show();
-        $("#menor").show();
+        #{/list}
+        #{list items:menores, as:'rs'}
+           $("#foo").append("<a class='link-ocorrencia' data-j='${rs.ocorrencia.j}'><div class='menor' style='left: ${rs.ocorrencia.j}px'></div></a>");
+        #{/list}
+
+        $(".link-ocorrencia").click(function(){
+            processa(${processamento.id}, $(this).data( "j" ));
+        });
     #{/if}
 });
 </script>

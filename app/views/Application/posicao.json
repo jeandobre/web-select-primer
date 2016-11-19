@@ -1,5 +1,5 @@
 {
-  "j": "${r.j}",
-  "tamanho": "${r.tamanho}",
-  "sequencia": "${r.sequencia}"
+  "j": "${resultado.ocorrencia.j}",
+  "tamanho": "${resultado.ocorrencia.r}",
+  "sequencia": "${resultado.ocorrencia.segmento}"
 }

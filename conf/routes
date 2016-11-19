@@ -4,11 +4,33 @@
 
 # Home page
 GET     /                                       Application.index
-POST    /process                                Application.process
-GET     /posicao/{<[0-9]+>j}                    Application.posicao(format:'json')
+GET     /main                                   Application.index
+GET     /default                                Application.index
+GET     /index                                  Application.index
+GET     /inicio                                 Application.index
 GET     /erro                                   Application.erro
+
+# Processamento
+
+POST    /process                                Application.process
 GET     /diagonal                               Application.diagonal
-GET     /result/{id}                            Application.result(id)
+
+# Resultado
+
+GET     /processamento                          Application.processamento
+GET     /processamento/{id}                     Application.result(id)
+GET     /processamento/beta/{id}                Application.ocorrencia
+GET     /processamento/{id}/beta/{posicao}      Application.ocorrenciaPosicao
+GET     /processamento/{id}/resultado           Application.resultado(id)
+GET     /processamento/salvar/{id}              Application.salvar_processamento(id)
+
+# Arquivos JSON
+
+GET     /posicao/{processamentoId}/{j}          Application.posicao(format:'json')
+GET     /processamento/excluir/{id}             Application.excluir(id)
+GET     /processamento/beta/{ocorrenciaId}/txt           Application.gerarFileOcorrencia(ocorrenciaId)
+GET     /processamento/resultado/{resultadoId}/txt       Application.gerarFileResultado(resultadoId)
+
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

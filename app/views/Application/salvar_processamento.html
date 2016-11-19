@@ -1,0 +1,80 @@
+#{extends 'main.html' /}
+#{set title:'Web Primers [Resultado]' /}
+#{set pagina:'Resultado do processamento ' + processamento.id /}
+
+#{set 'controles'}
+
+    <a id="voltar" href="/processamento/${processamento.id}" class="btn btn-default">
+        <span class="glyphicon glyphicon-arrow-left"></span>
+    </a>
+
+    #{if processamento.salvo == false}
+        <buttom id="salvar" class="btn btn-success"
+                type="buttom" title="Clique aqui para salvar este resultado" >Salvar resultado</buttom>
+    #{/if}
+#{/set}
+
+<div class="panel">
+    <label class="label label-default">Diferenças:</label>
+    <span>${processamento.quantidadeDiferencas}</span>
+
+    <label class="label label-default">Tipo de sequência:</label>
+    <span>${processamento.tipoSequencia}</span>
+
+    <label class="label label-default">Programa:</label>
+    <span>${processamento.programa.nome}</span>
+</div>
+
+<div class="panel">
+    <label class="label label-default">Inicio:</label>
+    <span>${processamento.inicio?.format('dd/MM/yyyy hh:mm')}</span>
+
+    <label class="label label-default">Fim:</label>
+    <span>${processamento.fim?.format('dd/MM/yyyy hh:mm')}</span>
+
+    <label class="label label-default">Tempo de processamento:</label>
+    <span>${processamento.tempoGasto}</span>
+</div>
+
+<div class="">
+    <label class="label label-primary" style="padding: 5px;">Sequência alvo:</label>
+    <span class="alfa-nome">${processamento.alfaNome}</span>
+    <span class="alfa-tamanho">${processamento.alfaTamanho} caracteres</span>
+    <ul>
+        #{list items:processamento.betas, as:'beta'}
+        <li>
+            <span class="beta-nome">${beta.nome}</span>
+            <span class="beta-tamanho">${beta.tamanho}</span>
+        </li>
+        #{/list}
+    </ul>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form id="form" action="@{Application.salvar}" method="pos">
+            <input type="hidden" id="id" value="${processamento.id}" name="id" />
+            <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input id="nome" type="text" class="form-control" name="nome" />
+            </div>
+            <div class="form-group">
+                <label for="informacao">Informação adicional:</label>
+                <textarea id="informacao" rows="8" style="width: 70%" autocomplete="off" class="form-control" name="informacao"></textarea>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $( document ).ready(function (){
+       $("#voltar").click(function(){
+          $('.div-ajax-carregamento-pagina').show();
+       });
+
+       $("#salvar").click(function(){
+          $('.div-ajax-carregamento-pagina').show();
+          $( "#form" ).submit();
+       });
+    });
+</script>

@@ -1,5 +1,6 @@
 package models;
 
+import play.db.jpa.GenericModel;
 import play.db.jpa.Model;
 
 import javax.persistence.*;
@@ -9,7 +10,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="ocorrencias", schema="public")
-public class Ocorrencia extends Model {
+public class Ocorrencia extends GenericModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,7 +18,7 @@ public class Ocorrencia extends Model {
     public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "beta_id", referencedColumnName="id")
+    @JoinColumn(name = "beta_id")
     public ArquivoBeta beta;
 
     @Column
@@ -29,4 +30,6 @@ public class Ocorrencia extends Model {
     @Column
     public String segmento;
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "ocorrencia")
+    public Resultado resultado;
 }

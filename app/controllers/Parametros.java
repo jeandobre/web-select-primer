@@ -1,6 +1,7 @@
 package controllers;
 
 import com.sun.istack.internal.NotNull;
+import models.TipoSequencia;
 import play.data.validation.Min;
 import play.data.validation.Required;
 import play.mvc.*;
@@ -28,7 +29,7 @@ public class Parametros{
    public Integer j;
    public Integer distancia;
 
-   public Integer tipoKdiference; //1-parcedias, 2 - diferentes
+   public TipoSequencia tipoSequencia;
 
    public Boolean maiorMenor = false;
    public Boolean regioesTamanhoFixo;
@@ -42,7 +43,7 @@ public class Parametros{
               ", tipoProcessamento=" + tipoProcessamento +
               ", j=" + j +
               ", distancia=" + distancia +
-              ", tipoKdiference=" + tipoKdiference +
+              ", tipoSequencia=" + tipoSequencia +
               '}';
    }
 }

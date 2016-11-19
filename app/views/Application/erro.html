@@ -1,22 +1,16 @@
 #{extends 'main.html' /}
 #{set title:'Web Primers [Erro]' /}
+#{set pagina:'Oops, um erro ocorreu!' /}
+#{set 'controles'}
+   <a id="novo" class="btn btn-primary" href="/">Novo processamento</a>
+#{/set}
 
-<div class="container-fluid">
-    <div class="page-header">
-        <h1>Web <small>Sistema de seleção de regiões específicas</small></h1>
-    </div>
 
-    #{ifErrors}
+#{ifErrors}
     <div class="alert alert-danger">
         <strong>Ocorreu um erro!</strong>
         #{errors}
         <li>${error}</li>
         #{/errors}
     </div>
-    #{/ifErrors}
-
-    <div class="pull-right">
-        <a id="novo" class="btn btn-primary" href="/">Novo processamento</a>
-    </div>
-
-</div>
+#{/ifErrors}

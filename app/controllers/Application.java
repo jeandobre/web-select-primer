@@ -1,7 +1,6 @@
 package controllers;
 
-import models.Processamento;
-import models.Resultado;
+import models.*;
 import persistence.ConvertFASTA2txt;
 import persistence.ProcessamentoBean;
 import persistence.ValidCharDNA;
@@ -13,10 +12,9 @@ import java.util.List;
 import play.data.validation.Valid;
 import play.cache.Cache;
 
+import javax.xml.transform.Result;
+
 public class Application extends Controller {
-
-    public static final String localEntrada = Play.configuration.getProperty("diretorio.entrada");
-
     public static void index() {
         Cache.clear();
         render();
@@ -30,16 +28,27 @@ public class Application extends Controller {
     public static void result(Long id){
 
         Processamento processamento = Processamento.findById(id);
+        if(processamento != null) {
+            //montar o componente
+            Integer i = 0;
+            List<Resultado> resultados = Resultado.todosResultadosPorProcessamentoOrdem(id);
+            Integer tamanho = resultados.size();
+            if(tamanho > 0) i = resultados.get(0).ocorrencia.j;
+            ComponenteOcorrencia ocr = new ComponenteOcorrencia(i, i + tamanho, tamanho);
 
-        //montar o componente
-        Integer i = processamento.resultados.get(0).ocorrencia.j;
-        Integer tamanho = processamento.resultados.size();
-        ComponenteOcorrencia ocr = new ComponenteOcorrencia(i, i + tamanho, tamanho);
+            List<Resultado> maiores = Resultado.todosResultadosMaiores(id);
+            List<Resultado> menores = Resultado.todosResultadosMenores(id);
 
-        render(processamento, ocr);
+            render(processamento, resultados, maiores, menores, ocr);
+        } else {
+            validation.addError("Parâmetros incorretos", "Não existe um processamento no banco de dados com id " + id + "!");
+            validation.keep();
+            erro();
+        }
     }
 
     public static void process(@Valid Parametros parametro){
+        final String localEntrada = Configuracao.getValor("diretorio.entrada");
 
         if(validation.hasErrors()) {
             validation.keep();
@@ -47,6 +56,7 @@ public class Application extends Controller {
         } else {
             Boolean fasta = (ConvertFASTA2txt.converter(parametro.alfa, localEntrada + "/" + parametro.alfa.getName()));
             Arquivo alfa = ValidCharDNA.validar(localEntrada + "/" + parametro.alfa.getName());
+            alfa.nome = parametro.alfa.getName();
             alfa.fasta = fasta;
             List<Arquivo> betas = new ArrayList<Arquivo>();
 
@@ -58,7 +68,8 @@ public class Application extends Controller {
                     fasta = (ConvertFASTA2txt.converter(f, localEntrada + "/" + f.getName()));
                     Arquivo bt = ValidCharDNA.validar(localEntrada + "/" + f.getName());
                     Arquivo beta = new Arquivo();
-                    beta.nome = bt.nome;
+                    beta.nome = f.getName();
+                    beta.local = bt.local;
                     beta.quantidadeCaracteres = bt.quantidadeCaracteres;
                     beta.sequencia = bt.sequencia;
                     beta.fasta = fasta;
@@ -92,8 +103,10 @@ public class Application extends Controller {
         }
     }
 
-    public static void posicao(int j){
-        render(Resultado.findById(j));
+    public static void posicao(Long processamentoId, Integer j){
+        System.out.println(processamentoId + ", " + j);
+        Resultado resultado = Resultado.getResultadoPorProcessamento(processamentoId, j);
+        render(resultado);
     }
 
     public static void diagonal(){
@@ -112,5 +125,118 @@ public class Application extends Controller {
 
         render(lista);
     }
+
+    public static void ocorrencia(Long id){
+        ArquivoBeta beta = ArquivoBeta.findById(id);
+        if(beta != null) {
+            Processamento processamento = beta.processamento;
+            List<Ocorrencia> ocorrencias = beta.ocorrencias;
+            render(processamento, beta, ocorrencias);
+        } else {
+            validation.addError("Parâmetros incorretos", "Não existe um arquivo beta com esse ID no banco de dados!");
+            validation.keep();
+            erro();
+        }
+    }
+
+    public static void ocorrenciaPosicao(Long id, Integer posicao){
+        ArquivoBeta beta = ArquivoBeta.buscarPorProcessamentoPosicao(id, posicao);
+        if(beta != null) {
+            Processamento processamento = beta.processamento;
+            List<Ocorrencia> ocorrencias = beta.ocorrencias;
+            render(processamento, beta, ocorrencias);
+        } else {
+            validation.addError("Parâmetros incorretos", "Não existe um arquivo beta com a posição "
+                    + posicao
+                    + " no processamento "
+                    + id + "  no banco de dados!");
+            validation.keep();
+            erro();
+        }
+    }
+
+    //mostrar todos os resultados em forma de tabela
+    public static void resultado(Long id){
+        Processamento processamento = Processamento.findById(id);
+        if(processamento != null) {
+            List<Resultado> resultados = Resultado.todosResultadosPorProcessamentoOrdem(id);
+            render(processamento, resultados);
+        } else {
+            validation.addError("Parâmetros incorretos", "Não existe um processamento no banco de dados com id " + id + "!");
+            validation.keep();
+            erro();
+        }
+    }
+
+    //mostar a lista de processamentos salvos
+    public static void processamento(){
+        List<Processamento> processamentos = Processamento.listaProcessamentosSalvos("");
+        render(processamentos);
+    }
+
+    public static void salvar_processamento(Long id){
+        Processamento processamento = Processamento.findById(id);
+        if(processamento != null) {
+            if(processamento.salvo){
+                validation.addError("Erro", "Este processamento já foi salvo!");
+                validation.keep();
+                erro();
+            } else {
+                render(processamento);
+            }
+        } else {
+            validation.addError("Parâmetros incorretos", "Não existe um processamento no banco de dados com id " + id + "!");
+            validation.keep();
+            erro();
+        }
+    }
+
+    public static void gerarFileResultado(Long resultadoId){
+        Resultado rs = Resultado.findById(resultadoId);
+        Ocorrencia ocr = rs.ocorrencia;
+
+        String nomeArquivo = "segmento_" + ocr.j;
+        response.setHeader("Content-type", "application/text; charset=utf-8");
+        response.setHeader("Content-disposition", "inline;  filename=\"" + nomeArquivo+".txt\"");
+        renderText("> posição: " + ocr.j + "; tamanho: " + ocr.r + ": " + ocr.segmento);
+    }
+
+    public static void gerarFileOcorrencia(Long ocorrenciaId){
+        Ocorrencia ocr = Ocorrencia.findById(ocorrenciaId);
+        String nomeArquivo = "segmento_" + ocr.j;
+        response.setHeader("Content-type", "application/text; charset=utf-8");
+        response.setHeader("Content-disposition", "inline;  filename=\"" + nomeArquivo+".txt\"");
+        renderText("> posição: " + ocr.j + "; tamanho: " + ocr.r + ": " + ocr.segmento);
+    }
+
+
+    public static void excluir(Long id){
+        Processamento processamento = Processamento.findById(id);
+        if(processamento != null) {
+            processamento.delete();
+        } else {
+            validation.addError("Parâmetros incorretos", "Não existe um processamento no banco de dados com id " + id + "!");
+            validation.keep();
+            erro();
+        }
+    }
+
+    public static void salvar(Long id, String nome, String informacao){
+        Processamento processamento = Processamento.findById(id);
+        if(processamento != null) {
+            processamento.nome = nome;
+            processamento.informacao = informacao;
+            processamento.salvo = Boolean.TRUE;
+            processamento.save();
+
+            ocorrencia(id);//mostrar novamente o resultado
+        } else {
+            validation.addError("Parâmetros incorretos", "Não existe um processamento no banco de dados com id " + id + "!");
+            validation.keep();
+            erro();
+        }
+    }
+
+
 
 }

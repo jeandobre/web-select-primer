@@ -1,0 +1,52 @@
+#{extends 'main.html' /}
+#{set title:'Web Primers [Resultados]' /}
+#{set pagina:'Resultados do processamento ' + processamento.id /}
+
+#{set 'controles'}
+    <a id="voltar" href="/processamento/${processamento.id}" class="btn btn-primary">
+        <span class="glyphicon glyphicon-arrow-left"></span>
+    </a>
+#{/set}
+
+<div>
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th style="width: 30px;">Sequência</th>
+                <th style="width: 60px;">Pos.</th>
+                <th style="width: 60px;">Tam.</th>
+                <th>Segmento</th>
+                <th style="width: 20px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            #{list items:resultados, as:'rs'}
+                <tr>
+                    <td style="text-align: center">${rs.ocorrencia.beta.posicao}</td>
+                    <td>${rs.ocorrencia.j}</td>
+                    <td>${rs.ocorrencia.r}</td>
+
+                    <td style="font-size: 10px" class="${rs.maior ? 'td-maior' : ''} ${rs.menor ? 'td-menor' : ''}">
+                       <span class="segmento">${rs.ocorrencia.segmento}</span>
+                    </td>
+
+                    <td>
+                        <a href="/processamento/resultado/${rs.id}/txt" class="salvar"
+                           title="Clique aqui para salvar este segmento em arquivo.">
+                            <span class="glyphicon glyphicon-save-file"></span>
+                        </a>
+                    </td>
+                </tr>
+            #{/list}
+        </tbody>
+    </table>
+</div>
+
+<script>
+   $( document ).ready(function(){
+
+      $("#voltar").click(function(){
+         $('.div-ajax-carregamento-pagina').show();
+      });
+   });
+</script>

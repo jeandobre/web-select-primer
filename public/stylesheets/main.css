@@ -10,25 +10,30 @@
 .fundo-sequencia{
    background-color: #ccc;
    border-bottom: 1px solid #337ab7;
+   height: 20px;
+   float: left;
+   position: relative;
 }
 
 .sequencia{
-   font-size: 10px;
-   margin-bottom: 0px;
+   /* margin-bottom: 0px; */
    color: white;
    background-color: #5bc0de;
    height: 18px;
-   line-height: 18px;
-   text-align: right;
-   padding-right: 5px;
+   border: none;
+   width: 1px;
+   float: left;
+}
+
+.sequencia:hover{
+   background-color: #337ab7;
 }
 
 .ocorrencia{
    background-color: #f0ad4e;
    height: 12px;
-   //margin-top: 1px;
+   clear:left;
    position:relative;
-   top: -25px;
    border-left: 1px solid #777;
    border-right: 1px solid #777;
 }
@@ -45,35 +50,29 @@
 
 .panel{
   margin-bottom: 10px !important;
+  margin-left: 15px;
 }
 
 .panel-body{
    padding: 5px !important;
 }
 
-.bordas{
-  height: 20px;
-  position: relative;
-  top: -20px;
-  background-color: #777;
-  border: none;
-  width: 1px;
-  display: inline-block;
-}
-
 .bloco{
-  width: 100%;
   overflow-x: auto;
   white-space: nowrap;
   overflow-y: hidden;
   border: 1px solid #286090;
   background-color: #ebf3fa;
   height: 90px;
+  margin: 0 5px 0 5px;
+  clear: both;
 }
 
 #j{
    font-size: 10px;
    color: #777;
+   float: left;
+   clear: both;
 }
 
 #r{
@@ -89,12 +88,15 @@
    margin: 10px;
 }
 
-#maior, #menor, #mouse{
-  background-color: #337ab7;
+.maior, .menor{
+ /* background-color: #337ab7;
   padding: 0px;
   height: 10px;
-  position: absolute;
-  top: 177px;
+  position: relative;
+  float: left;
+  top: 2px;
+  width: 1px;
+  margin: 0px; */
 }
 
 .div-ajax-carregamento-pagina{
@@ -118,11 +120,11 @@
    font-weight: normal;
 }
 
-#maior{
+.maior{
   background-color: #d9534f;
 }
 
-#menor{
+.menor{
   background-color: #5cb85c;
 }
 
@@ -132,4 +134,175 @@
 .alert li{
    margin-left: 28px;
    padding: 5px;
+}
+
+.beta-nome, .alfa-nome{
+   font-weight: bold;
+}
+
+.beta-tamanho, .alfa-tamanho{
+   font-size: 11px;
+   color: #777;
+}
+.badge a{
+  color: white;
+}
+
+.head{
+
+}
+
+.head .logo{
+  display: inline-block;
+  width: 390px;
+  border-right: 1px dotted #ccc;
+  margin-right: 15px;
+}
+
+.head .logo img{
+   margin: 6px;
+   float: left;
+}
+
+.head .info {
+ // float: right;
+  display: inline-block;
+ // font-size:11px;
+  color: #bfbaba;
+}
+
+.head .config{
+   display: inline-block;
+   width: 120px;
+   height: 90px;
+   padding-top: 25px;
+   float: right;
+   margin-left: 6px;
+   margin-right: 10px;
+}
+
+.head .titulo{
+   border-top: 1px solid #f1f1f1;
+   font-size: 22px;
+   margin-bottom: 5px;
+   padding-left: 8px;
+   color: #777;
+   padding-top: 3px;
+}
+
+.direitos{
+  float: right;
+  font-size: 11px;
+  margin-right: 10px;
+}
+
+.link-ocorrencia{
+   cursor: pointer;
+}
+
+.config .btn{
+  background-color: #f9f9f9;
+  border: 1px solid #fff;
+}
+
+.config .btn:hover{
+  color: #fff;
+  background-color: #563d7c;
+}
+
+.config .glyphicon {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.config .glyphicon-class {
+   display: block;
+}
+
+#dialog{
+   background-color: white;
+   width: 300px;
+   position: absolute;
+   bottom: 0;
+   right: 0;
+}
+
+#dialog img{
+   width: 100px;
+}
+
+.info-nome{
+   margin-left: 80px;
+   width: 150px;
+   text-overflow: ellipsis;
+   overflow: hidden;
+   white-space: nowrap;
+   border: 1px solid #000000;
+}
+
+.info-nome:hover {
+    text-overflow: inherit;
+    overflow: visible;
+}
+
+.info-info{
+   width: 300px;
+}
+
+.head{
+   position: fixed;
+   display: block;
+   height: 170px;
+   width: 100%;
+   background-color: white;
+   z-index: 1000;
+   left: 0;
+}
+
+.body{
+   top: 180px;
+   display: block;
+   position: absolute;
+   overflow-x: hidden;
+   overflow-y: auto;
+   height: 480px;
+   left: 0;
+   width: 100%;
+}
+
+.salvar {
+    font-size: 16px;
+}
+
+.zoom{
+  right: 0;
+  border: 1px solid #286090;
+  width: 80px;
+  float: right;
+  background-color: #ebf3fa;
+  margin-right: 5px;
+  padding: 2px;
+  position: relative;
+  top: 1px;
+}
+
+.sequencia-alfa-bloco{
+  margin-left: 10px;
+  width: 500px;
+  display: inline-block;
+  margin-top: 5px;
+}
+
+#foo{
+  float:left;
+  clear:left;
+}
+
+.td-maior{
+  border-left: 10px solid #d9534f;
+}
+
+.td-menor{
+  border-left: 10px solid #5cb85c;
 }

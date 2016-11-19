@@ -11,6 +11,7 @@ import play.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -22,32 +23,24 @@ public class ProcessamentoBean {
     private EntityManager em = JPA.em();
     //private EntityTransaction tx = JPA.em().getTransaction();
 
-    public static final String sequenciaParecida =  Play.configuration.getProperty("sequencia.parecida");
-    public static final String sequenciaDiferente = Play.configuration.getProperty("sequencia.diferente");
-    public static final String heuristica = Play.configuration.getProperty("sequencia.heuristica");
+    public static final String sequenciaParecida =  Configuracao.getValor("sequencia.parecida");
+    public static final String sequenciaDiferente = Configuracao.getValor("sequencia.diferente");
+    public static final String heuristica =         Configuracao.getValor("sequencia.heuristica");
 
-    public static final String localSaida = Play.configuration.getProperty("diretorio.saida");
+    public static final String localSaida =         Configuracao.getValor("diretorio.saida");
 
     public static Long processamento(Parametros parametro, Arquivo alfa, List<Arquivo> betas){
+        String getId = "";
+        Calendar calendar = Calendar.getInstance();
+        if(parametro.tipoSequencia == TipoSequencia.PARECIDAS) getId = sequenciaParecida;
+        else if(parametro.tipoSequencia == TipoSequencia.DIFERENTES) getId = sequenciaDiferente;
+        else getId = heuristica;
 
-        String commandLine;
-        String programa;
-        TipoSequencia tipoSequencia;
-        if (parametro.tipoKdiference == 1){
-            commandLine = sequenciaDiferente;
-            programa = "k-DifferencePrimer 1 -vs1";
-            tipoSequencia = TipoSequencia.DIFERENTES;
-        } else if (parametro.tipoKdiference == 2){
-            commandLine = sequenciaParecida;
-            programa = "k-DifferencePrimer 2 -vs1";
-            tipoSequencia = TipoSequencia.PARECIDAS;
-        } else{
-            commandLine = heuristica;
-            programa = "k-DifferencePrimer heuristica";
-            tipoSequencia = TipoSequencia.HEURISTICA;
-        }
+        Programa programa = Programa.findById(Long.valueOf( getId ) );
+        TipoSequencia tipoSequencia = programa.tipoSequencia;
 
-        commandLine += " -a " + alfa.nome;
+        String commandLine = programa.local + " " + programa.parametros;
+        commandLine += " -a " + alfa.local;
         commandLine += " -k " + parametro.k;
         Integer i = 0;
 
@@ -57,7 +50,7 @@ public class ProcessamentoBean {
         }
 
         Processamento processamento = new Processamento();
-        processamento.inicio = new Date();
+        processamento.inicio = calendar.getTime();
         processamento.alfaNome = alfa.nome;
         processamento.alfaArquivo = alfa.local;
         processamento.alfaTamanho = alfa.quantidadeCaracteres;
@@ -67,32 +60,37 @@ public class ProcessamentoBean {
         processamento.posicao = parametro.j;
         processamento.distancia = parametro.distancia;
         processamento.betas = new ArrayList<ArquivoBeta>(betas.size());
+        processamento.quantidadeDiferencas = parametro.k;
+        processamento.programa = programa;
 
         Integer saida = 1;
         String comando = "";
         for(Arquivo beta: betas){
-            beta.local = localSaida + "/out_"; // + session.getId() + "_" + saida;
-            String argumento = " -b " + beta.nome + " -sf " + beta.local;
-            //System.out.println(commandLine + argumento);
-            comando += commandLine + argumento + ";";
-            execCommand(commandLine + argumento);
-            saida++;
-
             ArquivoBeta b = new ArquivoBeta();
             b.nome = beta.nome;
             b.arquivo = beta.local;
             b.tamanho = beta.quantidadeCaracteres;
             b.processamento = processamento;
+            b.posicao = saida;
+
+            b.arquivoResultado = localSaida + "/out_" + saida;
+            String argumento = " -b " + b.arquivo + " -sf " + b.arquivoResultado;
+            //System.out.println(commandLine + argumento);
+            comando += commandLine + argumento + ";";
+            execCommand(commandLine + argumento);
+            saida++;
+
+            //b.arquivoResultado = beta.local;
             processamento.betas.add(b);
         }
-        processamento.fim = new Date();
-        //processamento.tempoGasto = processamento.fim - processamento.inicio;
+        processamento.fim = calendar.getTime();
+        processamento.tempoGasto = processamento.fim.getTime() - processamento.inicio.getTime();
         processamento.processamento = comando;
 
         //recupera os resultados por beta;
         for(ArquivoBeta beta : processamento.betas){
             beta.ocorrencias = new ArrayList<Ocorrencia>();
-            List<CandidatoPrimer> candidatos = CandidatoPrimer.computaResultado(beta.arquivo);
+            List<CandidatoPrimer> candidatos = CandidatoPrimer.computaResultado(beta.arquivoResultado);
             for (CandidatoPrimer cp : candidatos) {
                 Ocorrencia ocr = new Ocorrencia();
                 ocr.beta = beta;
@@ -123,28 +121,30 @@ public class ProcessamentoBean {
 
         //encontrar o maior e o menor
         //primeiro tenho que encontrar o valor maior e menor
-        Integer maior = 0;
-        Integer menor = processamento.alfaTamanho + 1; //pois não haverá nenhum maior que este tamanho
+        processamento.maiorTamanho = 0;
+        processamento.menorTamanho = processamento.alfaTamanho + 1; //pois não haverá nenhum maior que este tamanho
         for (Resultado re: processamento.resultados){
-            if(re.ocorrencia.r > maior) maior = re.ocorrencia.r;
-            if(re.ocorrencia.r < menor) menor = re.ocorrencia.r;
+            if(re.ocorrencia.r > processamento.maiorTamanho) processamento.maiorTamanho = re.ocorrencia.r;
+            if(re.ocorrencia.r < processamento.menorTamanho) processamento.menorTamanho = re.ocorrencia.r;
         }
         //depois encontramos todos os resultados maiores e menores;
         for (Resultado re: processamento.resultados){
-            if(re.ocorrencia.r == maior){
+            if(re.ocorrencia.r == processamento.maiorTamanho){
                 Maior big = new Maior();
                 big.resultado = re;
-                big.save();
+                re.maior = big;
+                //big.save();
             }
-            if(re.ocorrencia.r == menor){
+            if(re.ocorrencia.r == processamento.menorTamanho){
                 Menor small = new Menor();
                 small.resultado = re;
-                small.save();
+                re.menor = small;
+                //small.save();
             }
         }
 
         processamento.save();
-        return processamento.getId();
+        return processamento.id;
     }
 
     private synchronized static void execCommand(final String commandLine) {

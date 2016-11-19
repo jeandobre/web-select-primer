@@ -1,0 +1,86 @@
+#{extends 'main.html' /}
+#{set title:'Web Primers [Processamentos salvos]' /}
+#{set pagina:'Processamentos salvos' /}
+
+#{set 'controles'}
+    <a href="/" class="btn btn-primary">Novo Processamento</a>
+#{/set}
+
+    <div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th style="width: 210px;">Parâmetros</th>
+                    <th style="width: 250px;"></th>
+                    <th style="width: 180px;">Nome</th>
+                    <th>Informação</th>
+                    <th style="width: 20px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                #{list items:processamentos, as:'pr'}
+                    <tr data-linha-id="${pr.id}">
+                        <td>${pr.id}</td>
+                        <td>
+                          <span class="alfa-nome">${pr.alfaNome}</span>
+                          <span class="alfa-tamanho">${pr.alfaTamanho}</span>
+                          <ul>
+                              #{list items:pr.betas, as:'beta'}
+                                  <li>
+                                      <span class="beta-nome">${beta.nome}</span>
+                                      <span class="beta-tamanho">${beta.tamanho}</span>
+                                  </li>
+                              #{/list}
+                          </ul>
+                        </td>
+                        <td>
+                            <span class="label label-default">Sequências ${pr.tipoSequencia}</span>
+                            <div>
+                            <span>Quantidade de diferenças: ${pr.quantidadeDiferencas}<span>
+                            </div>
+                            <span>${pr.totalResultado} ocorrências</span>
+                        </td>
+                        <td>${pr.nome}</td>
+                        <td>${pr.informacao}</td>
+                        <td>
+                            <a href="/processamento/${pr.id}"
+                               title="Clique aqui para visualizar os resultados deste processamento">
+                                <span class="glyphicon glyphicon-share-alt selecionar"></span>
+                            </a>
+
+                            <a href="#" data-id="${pr.id}" class="excluir"
+                               title="Clique aqui para excluir os resultados deste processamento">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </a>
+                        </td>
+                    </tr>
+                #{/list}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    $( document ).ready(function (){
+       $(".selecionar").click(function(){
+            $('.div-ajax-carregamento-pagina').show();
+          //  $( "#formulario" ).submit();
+       });
+
+
+        $(".excluir").click(function(){
+             var id = $(this).data("id");
+             if(confirm('Deseja realmente excluir definitivamente os resultados do processamento ' + id + '?')){
+                 $('.div-ajax-carregamento-pagina').show();
+                 $.ajax({
+                  url: "/processamento/excluir/" + id,
+                  context: document.body
+                }).done(function() {
+                   $('[data-linha-id=' + id + ']').hide();
+                   $('.div-ajax-carregamento-pagina').hide();
+                });
+             }
+        });
+    });
+
+</script>

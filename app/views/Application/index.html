@@ -1,30 +1,19 @@
 #{extends 'main.html' /}
 #{set title:'Web Primers [início]' /}
+#{set pagina:'Novo processamento' /}
 
 <link href="@{'/public/stylesheets/jquery.filer.css'}" rel="stylesheet">
 <script src="@{'/public/javascripts/jquery.filer.min.js'}" type="text/javascript" charset="${_response_encoding}"></script>
 
-<!--<link href="@{'/public/stylesheets/uploadfile.css'}" rel="stylesheet">-->
-<!--<script src="@{'/public/javascripts/jquery.form.js'}" type="text/javascript" charset="${_response_encoding}"></script>-->
-<!--<script src="@{'/public/javascripts/jquery.uploadfile.min.js'}" type="text/javascript" charset="${_response_encoding}"></script>-->
+  #{form @Application.process(), enctype:'multipart/form-data', id:'formulario' }
 
-<div class="div-ajax-carregamento-pagina">
-  <div id="dialog" title="Processamento">
-    <p>Aguarde, processando...</p>
-  </div>
-</div>
+    #{set 'controles'}
+      <input id="processar-top" class="btn btn-primary processar" type="submit" value="Processar">
+      <a id="recuperar-top" class="btn btn-default" href="/processamento">Recuperar resultado</a>
+    #{/set}
 
-<div class="container-fluid">
-  <div class="page-header">
-    <h1>Web <small>Sistema de seleção de regiões específicas</small></h1>
-  </div>
-
-  #{form @Application.process(), enctype:'multipart/form-data' }
-
-    <div class="panel panel-default panel-success">
-      <div class="panel-heading">Adicione os parametros necessarios para iniciar</div>
+    <div class="panel">
       <div class="panel-body">
-
         <div class="form-group">
           <label for="alfa" class="col-sm-2 control-label">Sequência alvo:</label>
           <div class="col-sm-10">
@@ -47,13 +36,14 @@
             <input id="k" type="text" class="form-control" placeholder="1" name="parametro.k">
             
           </div> 
-          <span class="help-block">Digite a quantidade de diferenças desejada do primer para qualquer segmento da sequência BETA.<br/>
-          O valor deve estar entre 1 e o tamanho de ALFA.</span>
+          <span class="help-block">Digite a quantidade de diferenças desejada para a o segmento da sequência alvo
+            com qualquer segmento de outras sequências.<br/>
+          O valor deve estar entre 1 e o tamanho da sequência alvo.</span>
         </div>
       </div>
     </div>
 
-    <div class="panel panel-default panel-info">
+    <div class="panel panel-default panel-info" style="margin: 10px;">
       <div class="panel-heading">Opções</div>
       <div class="panel-body">
 
@@ -63,19 +53,19 @@
               <h4>Tipos de sequência</h4>
             </div>
             <label class="radio-inline">
-              <input type="radio" name="parametro.tipoKdiference" id="sequencia-diferente"
-                     data-toggle="tooltip" title="k-difference-prime-1"
-                     value="1" checked> Sequências diferentes
+              <input type="radio" name="parametro.tipoSequencia" id="sequencia-diferente"
+                     data-toggle="tooltip" title="Sequências são bem diferentes"
+                     value="DIFERENTES" checked> Sequências diferentes
             </label>
             <label class="radio-inline">
-              <input type="radio" name="parametro.tipoKdiference" id="sequencia-semelhante"
-                     data-toggle="tooltip" title="k-difference-prime-2"
-                     value="2"> Sequências semelhantes
+              <input type="radio" name="parametro.tipoSequencia" id="sequencia-semelhante"
+                     data-toggle="tooltip" title="Sequência são muito parecidas"
+                     value="PARECIDAS"> Sequências semelhantes
             </label>
             <label class="radio-inline">
-              <input type="radio" name="parametro.tipoKdiference" id="heuristica"
-                     data-toggle="tooltip" title="k-difference-prime-heuristica"
-                     value="3"> Heurística
+              <input type="radio" name="parametro.tipoSequencia" id="heuristica"
+                     data-toggle="tooltip" title="Heurística"
+                     value="HEURISTICA"> Heurística
             </label>
           </div>
 
@@ -84,24 +74,28 @@
               <h4>Posições</h4>
             </div>
             <div class="radio">
-              <input type="radio" name="parametro.tipoProcessamento" id="todas-posicao" value="1" checked>
+              <input type="radio" name="parametro.tipoProcessamento" id="todas-posicao" value="1" >
               Processar todas as posições possiveis.
             </div>
             <div class="radio">
-              <input type="radio" name="parametro.tipoProcessamento" id="uma-posicao" value="2">
-              Selecionar uma posição e uma distância.
+              <input type="radio" name="parametro.tipoProcessamento" id="uma-posicao" value="2" checked
+                     title="Selecione a posição de inicio e tamanho (quantidade de posições) que deverão ser processadas">
+              Selecionar uma posição e um tamanho.
             </div>
 
             <div class="form-group" id="opcoes">
               <div>
                 <label for="j" class="col-sm-2 control-label">Posição:</label>
                 <div class="col-sm-2">
-                    <input id="j" type="text" class="form-control" name="parametro.j">
+                    <input id="posicao" type="text" class="form-control" name="parametro.j"
+                           title="A posição de inicio de processamento da sequência alvo.">
                 </div>
 
-                <label for="distancia" class="col-sm-2 control-label">Distância:</label>
+                <label for="distancia" class="col-sm-2 control-label">Tamanho:</label>
                 <div class="col-sm-2">
-                    <input id="distancia" type="text" class="form-control" name="parametro.distancia">
+                    <input id="distancia" type="text" class="form-control"
+                           name="parametro.distancia"
+                           title="O tamanho ou quantidade de índices que serão processados apartir da posição.">
                 </div>
               </div>
             </div>
@@ -126,17 +120,12 @@
       </div>
     </div>
 
-      <div class="pull-right">
-        <input id="processar" class="btn btn-primary" type="submit" value="Processar">
-      </div>
-
   #{/form}
-</div>
 
-      <script>
+<script>
         $( document ).ready(function() {
 
-           $('[data-toggle="tooltip"]').tooltip();
+          $('[data-toggle="tooltip"]').tooltip();
 
           $('#alfa').filer({
               showThumbs: true,
@@ -163,7 +152,7 @@
               removeConfirmation: false
           });
 
-          $("#k, #j, #distancia").keypress(function (e) {
+          $("#k, #posicao, #distancia").keypress(function (e) {
             if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
                return false;
              }
@@ -182,12 +171,14 @@
             }
           });
 
-          $("#processar").click(function(){
+          $("#processar-top").click(function(){
             $('.div-ajax-carregamento-pagina').show();
-            $( "#dialog" ).dialog();
+            $( "#formulario" ).submit();
           });
 
-          $('.div-ajax-carregamento-pagina').hide();
-          $("#opcoes").hide();
+          $("#recuperar-top").click(function(){
+            $('.div-ajax-carregamento-pagina').show();
+          });
+
         });
-      </script>
+</script>

@@ -1,5 +1,6 @@
 package models;
 
+import play.db.jpa.GenericModel;
 import play.db.jpa.Model;
 
 import java.io.Serializable;
@@ -12,21 +13,23 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="processamentos", schema="public")
-public class Processamento extends Model {
+public class Processamento extends GenericModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
     public Long id;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column
     public Date inicio;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column
     public Date fim;
 
     @Column(name="tempo_gasto_segundos")
-    public Integer tempoGasto;
+    public Long tempoGasto;
 
     @Column(name="alfa_nome")
     public String alfaNome;
@@ -37,8 +40,13 @@ public class Processamento extends Model {
     @Column(name="alfa_tamanho")
     public Integer alfaTamanho;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="tipo_sequencia")
     public TipoSequencia tipoSequencia;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "programa_id")
+    public Programa programa;
 
     @Column(name="mostrar_maior_menor")
     public Boolean mostrarMaiorMenor;
@@ -55,18 +63,35 @@ public class Processamento extends Model {
     @Column
     public String processamento;
 
+    @Column(name = "quantidade_diferencas")
+    public Integer quantidadeDiferencas;
+
     @Column
     public String nome;
 
     @Column
     public String informacao;
 
+    @Column(name = "maior_tamanho")
+    public Integer maiorTamanho;
+
+    @Column(name = "menor_tamanho")
+    public Integer menorTamanho;
+
+    @Column(nullable = false)
+    public Boolean salvo = false;
+
     @OneToMany(cascade = CascadeType.ALL , fetch = FetchType.LAZY, mappedBy = "processamento", orphanRemoval=true)
+    @OrderBy("posicao")
     public List<ArquivoBeta> betas;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "processamento")
+    @OrderBy("ocorrencia")
     public List<Resultado> resultados;
 
+    public Integer getTotalResultado(){
+        return resultados.size();
+    }
 
     public Ocorrencia maiorPorPosicao(Integer posicao){
         Ocorrencia maior = null;
@@ -81,5 +106,11 @@ public class Processamento extends Model {
         }
 
         return maior;
+    }
+
+    public static List<Processamento> listaProcessamentosSalvos(String busca){
+        return Processamento.find(" salvo = true ORDER BY id DESC")
+                //.setParameter("busca","%" + busca + "%")
+                .fetch();
     }
 }

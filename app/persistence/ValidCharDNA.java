@@ -11,8 +11,7 @@ import java.io.*;
 public class ValidCharDNA {
     public static Arquivo validar(String file){
         Arquivo novo = new Arquivo();
-
-        novo.nome = file;
+        novo.local = file;
         novo.quantidadeCaracteres = 0;
         novo.sequencia = "";
         try{
@@ -20,10 +19,10 @@ public class ValidCharDNA {
             int value = 0;
             while((value = br.read()) != -1){
                 char c = (char)value;
-                if((c != 'A') && (c != 'C') && (c != 'G') && (c != 'T') && (c != 'U')){
+                /*if((c != 'A') && (c != 'C') && (c != 'G') && (c != 'T') && (c != 'U')){
                     System.out.println(c);
                     //TODO trhow erro
-                }
+                } */
                 novo.sequencia += c;
                 novo.quantidadeCaracteres++;
             }
