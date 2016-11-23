@@ -1,5 +1,7 @@
 package models;
 
+import controllers.Application;
+import play.Play;
 import play.db.jpa.GenericModel;
 import play.db.jpa.Model;
 
@@ -44,6 +46,23 @@ public class Resultado extends GenericModel {
         return find("processamento.id = :processamentoId ORDER BY ocorrencia.j ASC")
                 .setParameter("processamentoId", processamentoId)
                 .fetch();
+    }
+
+    public static List<Resultado> todosResultadosPorProcessamentoOrdem(Long processamentoId, Integer pagina){
+        final Integer linhas = Integer.valueOf(Play.configuration.getProperty("linhas-por-pagina"));
+
+        return find("processamento.id = :processamentoId ORDER BY ocorrencia.j ASC")
+                .setParameter("processamentoId", processamentoId)
+                .fetch(pagina, linhas);
+    }
+
+    public static int paginasResultadosPorProcessamento(Long processamentoId){
+        final double linhas = Double.valueOf(Play.configuration.getProperty("linhas-por-pagina"));
+
+        Query q1 = em().createQuery("SELECT COUNT(r) FROM Resultado r WHERE r.processamento.id = :processamentoId");
+        Long total = (Long) q1.setParameter("processamentoId", processamentoId).getSingleResult();
+
+        return (int) Math.ceil( total / linhas );
     }
 
     public static List<Resultado> todosResultadosMaiores(Long processamentoId){

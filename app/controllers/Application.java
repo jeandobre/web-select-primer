@@ -130,13 +130,28 @@ public class Application extends Controller {
         ArquivoBeta beta = ArquivoBeta.findById(id);
         if(beta != null) {
             Processamento processamento = beta.processamento;
-            List<Ocorrencia> ocorrencias = beta.ocorrencias;
-            render(processamento, beta, ocorrencias);
+            render(processamento, beta);
         } else {
             validation.addError("Parâmetros incorretos", "Não existe um arquivo beta com esse ID no banco de dados!");
             validation.keep();
             erro();
         }
+    }
+
+    //lista de ocorrencias JSON
+    public static void listaOcorrencia(Long betaId, Integer pagina){
+
+        List<Ocorrencia> ocorrencias = Ocorrencia.todasOcorrenciasPorBetaOrdem(betaId, pagina);
+        int total = Ocorrencia.paginasOcorrenciasPorBeta(betaId);
+        render(ocorrencias, pagina, total);
+    }
+
+    //lista de processamentos JSON
+    public static void listaProcessamento(String busca, Integer pagina){
+
+        List<Processamento> processamentos = Processamento.listaProcessamentosSalvos(busca, pagina);
+        int total = Processamento.paginasProcessamentos(busca);
+        render(processamentos, pagina, total);
     }
 
     public static void ocorrenciaPosicao(Long id, Integer posicao){
@@ -158,9 +173,10 @@ public class Application extends Controller {
     //mostrar todos os resultados em forma de tabela
     public static void resultado(Long id){
         Processamento processamento = Processamento.findById(id);
+        int total = Resultado.paginasResultadosPorProcessamento(id);
         if(processamento != null) {
-            List<Resultado> resultados = Resultado.todosResultadosPorProcessamentoOrdem(id);
-            render(processamento, resultados);
+            List<Resultado> resultados = Resultado.todosResultadosPorProcessamentoOrdem(id, 1);
+            render(processamento, resultados, total);
         } else {
             validation.addError("Parâmetros incorretos", "Não existe um processamento no banco de dados com id " + id + "!");
             validation.keep();
@@ -168,10 +184,16 @@ public class Application extends Controller {
         }
     }
 
+    //json para os resultados
+    public static void listaResultado(Long processamentoId, Integer pagina){
+        int total = Resultado.paginasResultadosPorProcessamento(processamentoId);
+        List<Resultado> resultados = Resultado.todosResultadosPorProcessamentoOrdem(processamentoId, pagina);
+        render(resultados, pagina, total);
+    }
+
     //mostar a lista de processamentos salvos
     public static void processamento(){
-        List<Processamento> processamentos = Processamento.listaProcessamentosSalvos("");
-        render(processamentos);
+        render();
     }
 
     public static void salvar_processamento(Long id){
@@ -209,7 +231,6 @@ public class Application extends Controller {
         renderText("> posição: " + ocr.j + "; tamanho: " + ocr.r + ": " + ocr.segmento);
     }
 
-
     public static void excluir(Long id){
         Processamento processamento = Processamento.findById(id);
         if(processamento != null) {
@@ -229,7 +250,7 @@ public class Application extends Controller {
             processamento.salvo = Boolean.TRUE;
             processamento.save();
 
-            ocorrencia(id);//mostrar novamente o resultado
+            result(id);//mostrar novamente o resultado
         } else {
             validation.addError("Parâmetros incorretos", "Não existe um processamento no banco de dados com id " + id + "!");
             validation.keep();

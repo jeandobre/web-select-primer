@@ -3,83 +3,113 @@
 #{set pagina:'Processamentos salvos' /}
 
 #{set 'controles'}
-    <a href="/" class="btn btn-primary">Novo Processamento</a>
+    <a href="/" class="btn btn-primary" style="float: left;">Novo Processamento</a>
+    <div class="buscar">
+        <div class="input-group">
+            <input type="text" class="form-control" id="busca" name="busca" placeholder="Procurar por..." />
+            <span class="input-group-btn">
+                <button id="bt-busca" class="btn btn-default" title="Clique aqui para iniciar a busca">Ir</button>
+            </span>
+        </div>
+    </div>
 #{/set}
 
+#{set 'table-header'}
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th style="width: 20px;">#</th>
+                <th style="width: 210px;">Parâmetros</th>
+                <th style="width: 250px;"></th>
+                <th style="width: 180px;">Nome</th>
+                <th>Informação</th>
+                <th style="width: 20px;"></th>
+            </tr>
+        </thead>
+    </table>
+#{/set}
     <div>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th style="width: 210px;">Parâmetros</th>
-                    <th style="width: 250px;"></th>
-                    <th style="width: 180px;">Nome</th>
-                    <th>Informação</th>
-                    <th style="width: 20px;"></th>
-                </tr>
-            </thead>
+        <table id="table" class="table table-striped table-hover">
             <tbody>
-                #{list items:processamentos, as:'pr'}
-                    <tr data-linha-id="${pr.id}">
-                        <td>${pr.id}</td>
-                        <td>
-                          <span class="alfa-nome">${pr.alfaNome}</span>
-                          <span class="alfa-tamanho">${pr.alfaTamanho}</span>
-                          <ul>
-                              #{list items:pr.betas, as:'beta'}
-                                  <li>
-                                      <span class="beta-nome">${beta.nome}</span>
-                                      <span class="beta-tamanho">${beta.tamanho}</span>
-                                  </li>
-                              #{/list}
-                          </ul>
-                        </td>
-                        <td>
-                            <span class="label label-default">Sequências ${pr.tipoSequencia}</span>
-                            <div>
-                            <span>Quantidade de diferenças: ${pr.quantidadeDiferencas}<span>
-                            </div>
-                            <span>${pr.totalResultado} ocorrências</span>
-                        </td>
-                        <td>${pr.nome}</td>
-                        <td>${pr.informacao}</td>
-                        <td>
-                            <a href="/processamento/${pr.id}"
-                               title="Clique aqui para visualizar os resultados deste processamento">
-                                <span class="glyphicon glyphicon-share-alt selecionar"></span>
-                            </a>
 
-                            <a href="#" data-id="${pr.id}" class="excluir"
-                               title="Clique aqui para excluir os resultados deste processamento">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </a>
-                        </td>
-                    </tr>
-                #{/list}
             </tbody>
         </table>
     </div>
 </div>
 <script>
     $( document ).ready(function (){
+
+       $(".head").css("height", "195px");
+
        $(".selecionar").click(function(){
-            $('.div-ajax-carregamento-pagina').show();
-          //  $( "#formulario" ).submit();
+           $('.div-ajax-carregamento-pagina').show();
        });
 
+        function carregar(busca, pagina){
+           $('.div-ajax-carregamento-pagina').show();
 
-        $(".excluir").click(function(){
-             var id = $(this).data("id");
-             if(confirm('Deseja realmente excluir definitivamente os resultados do processamento ' + id + '?')){
-                 $('.div-ajax-carregamento-pagina').show();
-                 $.ajax({
-                  url: "/processamento/excluir/" + id,
-                  context: document.body
-                }).done(function() {
-                   $('[data-linha-id=' + id + ']').hide();
-                   $('.div-ajax-carregamento-pagina').hide();
-                });
-             }
+           $.getJSON( "/processamento-json/" + busca + "/" + pagina, function( data ) {
+               var restante = data.restante;
+               for (var i = 0; i < data.lista.length; i++) {
+                   var texto = '<tr data-linha-id="' + data.lista[i].id + '">';
+                       texto +='<td  style="width: 20px;">' + data.lista[i].id + '</td>';
+                       texto +='<td  style="width: 210px;">';
+                       texto +='     <span class="alfa-nome">' + data.lista[i].alfaNome + '</span>';
+                       texto +='     <span class="alfa-tamanho">' + data.lista[i].alfaTamanho + '</span>';
+                       texto +='<ul>' + data.lista[i].beta + '</ul></td>';
+                       texto +='<td  style="width: 250px;">';
+                       texto +='      <span class="label label-default">Sequências ' + data.lista[i].tipoSequencia + '</span>';
+                       texto +='      <div><span>Quantidade de diferenças: ' + data.lista[i].quantidadeDiferencas + '<span></div>';
+                       texto +='           <span>' + data.lista[i].totalResultado + ' ocorrências</span></td>';
+                       texto +='<td  style="width: 180px;">' + data.lista[i].nome + '</td>';
+                       texto +='<td>' + data.lista[i].informacao + '</td>';
+                       texto +='<td  style="width: 20px;">';
+                       texto +='<a href="/processamento/' + data.lista[i].id + '"';
+                       texto +='   title="Clique aqui para visualizar os resultados deste processamento">';
+                       texto +='   <span class="glyphicon glyphicon-share-alt selecionar"></span></a>';
+                       texto +='<a href="#" data-id="' + data.lista[i].id + '" class="excluir"';
+                       texto +='   title="Clique aqui para excluir os resultados deste processamento">';
+                       texto +='   <span class="glyphicon glyphicon-trash"></span></a></td></tr>';
+
+                    $('#table').find('tbody').append(texto);
+
+                    $('.div-ajax-carregamento-pagina').hide();
+
+                    $(".excluir").unbind('click');
+
+                    $(".excluir").click(function(){
+                      var id = $(this).data("id");
+                      if(confirm('Deseja realmente excluir definitivamente os resultados do processamento ' + id + '?')){
+                         $('.div-ajax-carregamento-pagina').show();
+                         $.ajax({
+                          url: "/processamento/excluir/" + id,
+                          context: document.body
+                        }).done(function() {
+                           $('[data-linha-id=' + id + ']').hide();
+                           $('.div-ajax-carregamento-pagina').hide();
+                        });
+                      }
+                    });
+                }
+
+                $('.body').unbind('scroll');
+                if(restante > 0){
+                    $('.body').scroll(function(){
+
+                      if($('#table').height() - $('.body').scrollTop() == 442)
+                        carregar(busca, pagina + 1);
+                    });
+                }
+           });
+        }
+
+        carregar(" ", 1);
+
+        $("#bt-busca").click(function(){
+           $('.div-ajax-carregamento-pagina').show();
+           $('#table tbody').empty();
+           var busca = $("#busca").val();
+           carregar(busca, 1);
         });
     });
 

@@ -29,6 +29,10 @@
    background-color: #337ab7;
 }
 
+.selected{
+   background-color: #777;
+}
+
 .ocorrencia{
    background-color: #f0ad4e;
    height: 12px;
@@ -79,9 +83,10 @@
   font-size: 9px;
   color: #777;
   font-weight: bold;
-  top: -30px;
+  top: -15px;
   display: inline-block;
   position: relative;
+
 }
 
 .margem-10{
@@ -143,6 +148,7 @@
 .beta-tamanho, .alfa-tamanho{
    font-size: 11px;
    color: #777;
+   margin-left: 5px;
 }
 .badge a{
   color: white;
@@ -305,4 +311,15 @@
 
 .td-menor{
   border-left: 10px solid #5cb85c;
+}
+
+.table{
+  background-color: white;
+}
+
+.buscar{
+  display: block;
+  width: 400px;
+  float: left;
+  margin-left: 10px;
 }

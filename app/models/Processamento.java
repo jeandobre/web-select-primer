@@ -1,5 +1,6 @@
 package models;
 
+import play.Play;
 import play.db.jpa.GenericModel;
 import play.db.jpa.Model;
 
@@ -108,9 +109,25 @@ public class Processamento extends GenericModel {
         return maior;
     }
 
-    public static List<Processamento> listaProcessamentosSalvos(String busca){
-        return Processamento.find(" salvo = true ORDER BY id DESC")
-                //.setParameter("busca","%" + busca + "%")
-                .fetch();
+    public static List<Processamento> listaProcessamentosSalvos(String busca, Integer pagina){
+        final Integer linhas = Integer.valueOf(Play.configuration.getProperty("linhas-por-pagina"));
+
+        return Processamento.find("(alfaNome like :busca OR alfaArquivo like :busca " +
+                " OR nome like :busca OR informacao like :busca) " +
+                "AND (salvo = true) ORDER BY id DESC")
+                .setParameter("busca","%" + busca + "%")
+                .fetch(pagina, linhas);
+    }
+
+    public static int paginasProcessamentos(String busca){
+        final double linhas = Double.valueOf(Play.configuration.getProperty("linhas-por-pagina"));
+
+        Query q1 = em().createQuery("SELECT COUNT(p) FROM Processamento p " +
+                "WHERE (alfaNome like :busca OR alfaArquivo like :busca " +
+                "OR nome like :busca OR informacao like :busca) " +
+                "AND (salvo = true)");
+        Long total = (Long) q1.setParameter("busca","%" + busca + "%").getSingleResult();
+
+        return (int) Math.ceil( total / linhas );
     }
 }

@@ -83,8 +83,6 @@ public class ProcessamentoBean {
             //b.arquivoResultado = beta.local;
             processamento.betas.add(b);
         }
-        processamento.fim = calendar.getTime();
-        processamento.tempoGasto = processamento.fim.getTime() - processamento.inicio.getTime();
         processamento.processamento = comando;
 
         //recupera os resultados por beta;
@@ -94,7 +92,7 @@ public class ProcessamentoBean {
             for (CandidatoPrimer cp : candidatos) {
                 Ocorrencia ocr = new Ocorrencia();
                 ocr.beta = beta;
-                ocr.j = cp.j;
+                ocr.j = cp.j + 1; //para não iniciar em zero
                 ocr.r = cp.tamanho;
                 ocr.segmento = cp.sequencia;
                 beta.ocorrencias.add(ocr);
@@ -133,16 +131,18 @@ public class ProcessamentoBean {
                 Maior big = new Maior();
                 big.resultado = re;
                 re.maior = big;
-                //big.save();
             }
             if(re.ocorrencia.r == processamento.menorTamanho){
                 Menor small = new Menor();
                 small.resultado = re;
                 re.menor = small;
-                //small.save();
             }
         }
-
+        calendar = Calendar.getInstance();
+        processamento.fim = calendar.getTime();
+        long diff =  processamento.fim.getTime() - processamento.inicio.getTime();
+        long diffSeconds = diff / 1000 % 60;
+        processamento.tempoGasto = diffSeconds;
         processamento.save();
         return processamento.id;
     }

@@ -1,0 +1,15 @@
+{
+
+ "lista":[
+  #{list items:ocorrencias, as:'ocr'}
+{
+ "id": "${ocr.id}",
+ "j": "${ocr.j}",
+ "r": "${ocr.r}",
+ "classe" : "${ocr.resultado != null ? "glyphicon-pushpin" : "" }",
+ "segmento": "${ocr.segmento}"
+}  #{if !ocr_isLast},#{/if}
+  #{/list}
+],
+"restante" : "${total - pagina}"
+}

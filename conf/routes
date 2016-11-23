@@ -26,8 +26,11 @@ GET     /processamento/salvar/{id}              Application.salvar_processamento
 
 # Arquivos JSON
 
-GET     /posicao/{processamentoId}/{j}          Application.posicao(format:'json')
-GET     /processamento/excluir/{id}             Application.excluir(id)
+GET     /posicao/{processamentoId}/{j}                   Application.posicao(format:'json')
+GET     /resultado-json/{processamentoId}/{pagina}       Application.listaResultado(format:'json')
+GET     /beta-json/{betaId}/{pagina}                     Application.listaOcorrencia(format:'json')
+GET     /processamento-json/{busca}/{pagina}             Application.listaProcessamento(format:'json')
+GET     /processamento/excluir/{id}                      Application.excluir(id)
 GET     /processamento/beta/{ocorrenciaId}/txt           Application.gerarFileOcorrencia(ocorrenciaId)
 GET     /processamento/resultado/{resultadoId}/txt       Application.gerarFileResultado(resultadoId)
 

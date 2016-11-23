@@ -1,9 +1,11 @@
 package models;
 
+import play.Play;
 import play.db.jpa.GenericModel;
 import play.db.jpa.Model;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by jeandobre on 20/10/16.
@@ -32,4 +34,21 @@ public class Ocorrencia extends GenericModel {
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "ocorrencia")
     public Resultado resultado;
+
+    public static List<Ocorrencia>  todasOcorrenciasPorBetaOrdem(Long betaId, Integer pagina){
+        final Integer linhas = Integer.valueOf(Play.configuration.getProperty("linhas-por-pagina"));
+
+        return find("beta.id = :betaId ORDER BY j ASC")
+                .setParameter("betaId", betaId)
+                .fetch(pagina, linhas);
+    }
+
+    public static int paginasOcorrenciasPorBeta(Long betaId){
+        final double linhas = Double.valueOf(Play.configuration.getProperty("linhas-por-pagina"));
+
+        Query q1 = em().createQuery("SELECT COUNT(o) FROM Ocorrencia o WHERE o.beta.id = :betaId");
+        Long total = (Long) q1.setParameter("betaId", betaId).getSingleResult();
+
+        return (int) Math.ceil( total / linhas );
+    }
 }

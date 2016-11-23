@@ -8,48 +8,63 @@
     </a>
 #{/set}
 
-<div>
+#{set 'table-header'}
     <table class="table table-striped table-hover">
         <thead>
             <tr>
                 <th style="width: 20px"></th>
                 <th style="width: 40px">Pos.</th>
                 <th style="width: 40px">Tam.</th>
-                <th style="width: 20px"></th>
                 <th>Segmento</th>
+                <th style="width: 20px"></th>
             </tr>
         </thead>
+    </table>
+#{/set}
+
+<div>
+    <table id="table" class="table table-striped table-hover">
         <tbody>
-            #{list items:ocorrencias, as:'ocr'}
-                <tr>
-                    <td>
-                        #{if ocr.resultado != null }
-                            <span class="glyphicon glyphicon-pushpin""></span>
-                        #{/if}
-                    </td>
-                    <td>${ocr.j}</td>
-                    <td>${ocr.r}</td>
-                    <td>
-                        <a href="/processamento/beta/${ocr.id}/txt" class="salvar"
-                           title="Clique aqui para salvar este segmento em arquivo.">
-                            <span class="glyphicon glyphicon-save-file"></span>
-                        </a>
-                    </td>
-                    <td style="font-size: 10px">
-                        <span style="word-break: break-all;">
-                            ${ocr.segmento}
-                        </span>
-                    </td>
-                </tr>
-            #{/list}
+
         </tbody>
     </table>
 </div>
 
 <script>
    $( document ).ready(function(){
+      $(".head").css("height", "195px");
+
       $("#voltar").click(function(){
          $('.div-ajax-carregamento-pagina').show();
       });
+
+      function carregar(pagina){
+          $.getJSON( "/beta-json/${beta.id}/" + pagina, function( data ) {
+               var restante = data.restante;
+               for (var i = 0; i < data.lista.length; i++) {
+                   var texto = '<tr><td style="width: 20px"> <span class="glyphicon '+ data.lista[i].classe +'"></span></td>';
+                       texto +='<td style="width: 40px">' + data.lista[i].j + '</td>';
+                       texto +='<td style="width: 40px">' + data.lista[i].r + '</td>';
+                       texto += '<td style="font-size: 10px">';
+                       texto += '<span style="word-break: break-all;">' + data.lista[i].segmento;
+                       texto += '</span></td>';
+                       texto += '<td><a href="/processamento/beta/'+data.lista[i].id+'/txt" class="salvar"';
+                       texto += ' title="Clique aqui para salvar este segmento em arquivo.">';
+                       texto += '<span class="glyphicon glyphicon-save-file"></span></a></td>';
+                       texto += '</tr>';
+                    $('#table').find('tbody').append(texto);
+                }
+                //console.log(restante);
+                $('.body').unbind('scroll');
+                if(restante > 0){
+                    $('.body').scroll(function(){
+
+                      if($('#table').height() - $('.body').scrollTop() == 442)
+                        carregar(pagina + 1);
+                    });
+                }
+          });
+      }
+      carregar(1);
    });
 </script>

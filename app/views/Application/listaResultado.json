@@ -1,0 +1,16 @@
+{
+
+ "lista":[
+  #{list items:resultados, as:'rs'}
+{
+ "id": "${rs.id}",
+ "posicao": "${rs.ocorrencia.beta.posicao}",
+ "j": "${rs.ocorrencia.j}",
+ "r": "${rs.ocorrencia.r}",
+ "classe": "${rs.maior ? 'td-maior' : ''}${rs.menor ? 'td-menor' : ''}",
+ "segmento": "${rs.ocorrencia.segmento}"
+}  #{if !rs_isLast},#{/if}
+  #{/list}
+],
+"restante" : "${total - pagina}"
+}

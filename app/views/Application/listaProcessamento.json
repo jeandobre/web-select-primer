@@ -1,0 +1,20 @@
+{
+ "lista":[
+  #{list items:processamentos, as:'pr'}
+  {
+   "id": "${pr.id}",
+   "alfaNome" : "${pr.alfaNome}",
+   "alfaTamanho" : "${pr.alfaTamanho}",
+   "beta" : #{list items:pr.betas, as:'beta'}
+      "<li><span class='beta-nome'>${beta.nome}</span><span class='beta-tamanho'>${beta.tamanho}</span></li>"
+    #{/list},
+   "tipoOcorrencia": "${pr.tipoSequencia}",
+   "quantidadeDiferencas": "${pr.quantidadeDiferencas}",
+   "totalResultado" : "${pr.totalResultado}",
+   "nome": "${pr.nome}",
+   "informacao" : "${pr.informacao}"
+  }  #{if !pr_isLast},#{/if}
+  #{/list}
+],
+"restante" : "${total - pagina}"
+}

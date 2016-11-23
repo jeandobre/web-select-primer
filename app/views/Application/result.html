@@ -58,13 +58,18 @@
 
     <div class="bloco">
       <span id="j"></span>
-      <div id="foo" style="width: ${processamento.alfaTamanho}px">
+      <div id="foo" style="width: ${processamento.alfaTamanho + 1}px">
 
       </div>
 
-      <div class="fundo-sequencia" style="width: ${processamento.alfaTamanho}px">
+      <div class="fundo-sequencia" style="width: ${processamento.alfaTamanho + 1}px">
          #{list items:resultados, as:'rs'}
-            <div class="sequencia" #{if rs_isFirst} style="margin-left: ${rs.ocorrencia.j}px;" #{/if} ></div>
+            <div data-j="${rs.ocorrencia.j}" class="sequencia
+                 #{if processamento.mostrarMaiorMenor == true}
+                    #{if rs.menor} menor #{/if}
+                    #{if rs.maior} maior #{/if}
+                 #{/if}"
+                 #{if rs_isFirst} style="margin-left: ${rs.ocorrencia.j}px;" #{/if} ></div>
          #{/list}
       </div>
 
@@ -141,6 +146,7 @@
            $("#j").css("margin-left", j + "px");
 
            $("#r").html(r);
+           t = t + 7;
            $("#r").css("margin-left", t + "px");
 
            $("#prime").html( data.sequencia );
@@ -168,24 +174,16 @@ $( document ).ready(function() {
        $(".bloco").animate({ 'zoom': 1.0 }, 400);
     });
 
-    $( ".sequencia" )
-        .click( function( event ) {
-           var position = $(this).offset();
-           var j = Math.trunc(position.left) - 6;
-           processa(${processamento.id}, j);
-        });
+    $( ".sequencia" ).click( function( event ) {
+      $(".sequencia").removeClass('selected');
+       var j = $(this).data("j");
+      $(this).addClass('selected')
+       processa(${processamento.id}, j);
+    });
 
     processa(${processamento.id}, ${ocr.inicio});
 
     #{if processamento.mostrarMaiorMenor == true }
-        #{list items:maiores, as:'rs'}
-          $("#foo").append("<a class='link-ocorrencia' data-j='${rs.ocorrencia.j}'><div class='maior' style='left: ${rs.ocorrencia.j}px'></div></a>");
-
-        #{/list}
-        #{list items:menores, as:'rs'}
-           $("#foo").append("<a class='link-ocorrencia' data-j='${rs.ocorrencia.j}'><div class='menor' style='left: ${rs.ocorrencia.j}px'></div></a>");
-        #{/list}
-
         $(".link-ocorrencia").click(function(){
             processa(${processamento.id}, $(this).data( "j" ));
         });

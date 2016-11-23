@@ -49,6 +49,7 @@
                     #{get 'controles' /}
                 </div>
             </div>
+            #{get 'table-header' /}
         </div>
         <div class="body">
             #{doLayout /}
@@ -63,12 +64,14 @@
           $('.div-ajax-carregamento-pagina').hide();
 
           var alt = $( document ).height();
-          $(".body").css("height", alt - 180);
+          var size = $(".head").height() + 5;
+          $(".body").css("top", size);
+          $(".body").css("height", alt - size);
 
           $( window ).resize(function() {
              var alt = $( document ).height();
-             //$(".logo").html(alt-190);
-             $(".body").css("height", alt - 180);
+             var size = $(".head").height() + 5;
+             $(".body").css("height", alt - size);
           });
         });
     </script>
