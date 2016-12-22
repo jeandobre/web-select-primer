@@ -149,7 +149,7 @@ public class Application extends Controller {
     //lista de processamentos JSON
     public static void listaProcessamento(String busca, Integer pagina){
 
-        List<Processamento> processamentos = Processamento.listaProcessamentosSalvos(busca, pagina);
+        List<ViewProcessamento> processamentos = ViewProcessamento.listaProcessamentosSalvos(busca, pagina);
         int total = Processamento.paginasProcessamentos(busca);
         render(processamentos, pagina, total);
     }

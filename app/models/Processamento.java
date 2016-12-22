@@ -90,9 +90,9 @@ public class Processamento extends GenericModel {
     @OrderBy("ocorrencia")
     public List<Resultado> resultados;
 
-    public Integer getTotalResultado(){
+    /*public Integer getTotalResultado(){
         return resultados.size();
-    }
+    }*/
 
     public Ocorrencia maiorPorPosicao(Integer posicao){
         Ocorrencia maior = null;
@@ -107,16 +107,6 @@ public class Processamento extends GenericModel {
         }
 
         return maior;
-    }
-
-    public static List<Processamento> listaProcessamentosSalvos(String busca, Integer pagina){
-        final Integer linhas = Integer.valueOf(Play.configuration.getProperty("linhas-por-pagina"));
-
-        return Processamento.find("(alfaNome like :busca OR alfaArquivo like :busca " +
-                " OR nome like :busca OR informacao like :busca) " +
-                "AND (salvo = true) ORDER BY id DESC")
-                .setParameter("busca","%" + busca + "%")
-                .fetch(pagina, linhas);
     }
 
     public static int paginasProcessamentos(String busca){
