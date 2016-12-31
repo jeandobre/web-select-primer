@@ -1,13 +1,25 @@
 package persistence;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 public class ConvertFASTA2txt {
+
+	public static String converter(String texto){
+		BufferedReader br = new BufferedReader(new StringReader(texto));
+		String retorno = "";
+		try{
+
+			while(br.ready()){
+				String linha = br.readLine();
+				if(linha == null) break;
+				if(linha.length() > 0 && linha.charAt(0) == '>') continue;
+				retorno += linha;
+			}
+		}catch(IOException ioe){
+			ioe.printStackTrace();
+		}
+		return retorno;
+	}
 	
 	public static Boolean converter(File file, String localArquivoTxt){
         Boolean fasta = false;

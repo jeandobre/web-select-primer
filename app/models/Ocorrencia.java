@@ -32,6 +32,12 @@ public class Ocorrencia extends GenericModel {
     @Column
     public String segmento;
 
+    @Column
+    public String letra;
+
+    @Column(name = "posicao_tela")
+    public Integer posicaoTela;
+
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "ocorrencia")
     public Resultado resultado;
 

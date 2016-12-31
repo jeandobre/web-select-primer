@@ -1,21 +1,22 @@
-<!DOCTYPE html>
+#{extends 'main.html' /}
+#{set title:'Web Primers [Erro interno]' /}
+#{set pagina:'Oops, um erro ocorreu!' /}
+#{set 'controles'}
+<a id="novo" class="btn btn-primary" href="/">Novo processamento</a>
+#{/set}
 
-<html>
-    <head>
-        <title>Application error</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=${_response_encoding}"/>
-    </head>
-    <body>
-        #{if play.mode.name() == 'DEV'}
-            #{500 exception /}
-        #{/if}
-        #{else}
-            <h1>Oops, an error occurred</h1>
-            #{if exception instanceof play.exceptions.PlayException}
-                <p>
-                    This exception has been logged with id <strong>${exception.id}</strong>.
-                </p>
-            #{/if}
-        #{/else}
-    </body>
-</html>
+
+#{ifErrors}
+<div class="alert alert-danger">
+    <strong>Ocorreu um erro!</strong>
+    #{if play.mode.name() == 'DEV'}
+    #{404 result /}
+    #{/if}
+    #{else}
+    <h1>Um erro interno de processamento ocorreu!</h1>
+    <p>
+        ${result.message}
+    </p>
+    #{/else}
+</div>
+#{/ifErrors}

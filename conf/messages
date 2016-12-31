@@ -1,6 +1,9 @@
-validation.required=%s é um campo obrigatório.
-validation.failed=Campos obrigatórios
 parametro.k=Quantidade de diferenças
 parametro.alfa=Sequência alvo
-parametro.beta=Sequências
-
+parametro.beta=Sequências comparadas
+parametro.distancia=Distância entre duas ocorrências
+parametro.limiteCaracteres=Limite de caracteres nas ocorrências
+parametro.jInicio=Posição de início
+parametro.jFim=Posição de fim
+validation.required=%s é um campo obrigatório e não pode ficar vazio.
+validation.failed=Campos obrigatórios

@@ -1,19 +1,22 @@
-<!DOCTYPE html>
+#{extends 'main.html' /}
+#{set title:'Web Primers [Página não encontrada]' /}
+#{set pagina:'Oops, um erro ocorreu!' /}
+#{set 'controles'}
+    <a id="novo" class="btn btn-primary" href="/">Novo processamento</a>
+#{/set}
 
-<html>
-    <head>
-        <title>Not found</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=${_response_encoding}"/>    
-    </head>
-    <body>
-        #{if play.mode.name() == 'DEV'}
-            #{404 result /}
-        #{/if}
-        #{else}
-            <h1>Not found</h1>
-            <p>
-                ${result.message}
-            </p>
-        #{/else}
-    </body>
-</html>
+
+#{ifErrors}
+<div class="alert alert-danger">
+    <strong>Ocorreu um erro!</strong>
+    #{if play.mode.name() == 'DEV'}
+        #{404 result /}
+    #{/if}
+    #{else}
+        <h1>Página não encontrada</h1>
+        <p>
+            ${result.message}
+        </p>
+    #{/else}
+</div>
+#{/ifErrors}

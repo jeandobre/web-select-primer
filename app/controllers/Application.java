@@ -7,8 +7,13 @@ import persistence.ValidCharDNA;
 import play.*;
 import play.mvc.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import play.data.validation.Valid;
 import play.cache.Cache;
 
@@ -24,6 +29,16 @@ public class Application extends Controller {
         validation.keep();
         render();
     }
+
+    /****
+     *
+     * @param id
+     */
+    public static void computar(){
+        ProcessamentoBean.computarResultado();
+       // ProcessamentoBean.computarResultado2();
+    }
+
 
     public static void result(Long id){
 
@@ -49,56 +64,117 @@ public class Application extends Controller {
 
     public static void process(@Valid Parametros parametro){
         final String localEntrada = Configuracao.getValor("diretorio.entrada");
+        Arquivo alfa;
+        List<Arquivo> betas = new ArrayList<Arquivo>();
+
+        System.out.println(parametro.toString());
 
         if(validation.hasErrors()) {
             validation.keep();
             erro();
         } else {
-            Boolean fasta = (ConvertFASTA2txt.converter(parametro.alfa, localEntrada + "/" + parametro.alfa.getName()));
-            Arquivo alfa = ValidCharDNA.validar(localEntrada + "/" + parametro.alfa.getName());
-            alfa.nome = parametro.alfa.getName();
-            alfa.fasta = fasta;
-            List<Arquivo> betas = new ArrayList<Arquivo>();
-
-            if( parametro.beta == null ){
+            if(parametro.tipoSequenciaAlfa == 1) validation.required("parametro.alfa", parametro.textoAlfa);
+            else validation.required("parametro.alfa", parametro.alfa);
+            if(parametro.tipoSequenciaBeta == 1) validation.required("parametro.beta", parametro.textoBeta);
+            else if (parametro.beta == null || parametro.beta.length == 0)
                 validation.addError("Erro", "É necessário adicionar uma ou mais sequências para o processamento!");
-            } else {
-                for(File f: parametro.beta) {
-                    System.out.println(f.getName());
-                    fasta = (ConvertFASTA2txt.converter(f, localEntrada + "/" + f.getName()));
-                    Arquivo bt = ValidCharDNA.validar(localEntrada + "/" + f.getName());
-                    Arquivo beta = new Arquivo();
-                    beta.nome = f.getName();
-                    beta.local = bt.local;
-                    beta.quantidadeCaracteres = bt.quantidadeCaracteres;
-                    beta.sequencia = bt.sequencia;
-                    beta.fasta = fasta;
-                    betas.add( beta );
 
-                    bt = null;
-                }
+            if(!parametro.tipoProcessamento){
+                validation.required("parametro.jInicio", parametro.jInicio);
+                validation.required("parametro.jFim", parametro.jFim);
             }
 
-            if (alfa.quantidadeCaracteres < parametro.k) {
-                validation.addError("Erro", "A quantidade de diferenças (k) não pode ser maior que a quantidade de caracteres da sequência alvo");
+            if(parametro.mostrarDistancia){
+                validation.required("parametro.distancia",parametro.distancia);
+            }
+            if(parametro.mostrarLimiteCaracteres){
+                validation.required("parametro.limiteCaracteres",parametro.limiteCaracteres);
             }
 
-            if (!parametro.tipoProcessamento) {
-                if (parametro.j == parametro.distancia) { //se o j for igual a distancia esta errado
-                     validation.addError("Erro", "O valor de j não pode ser igual à distância!");
-                }
-                if (parametro.j > alfa.quantidadeCaracteres) { //se
-                     validation.addError("Erro", "O valor de j deve estar no intervalo entre 0 e a quantidade de caracteres da sequência alvo");
-                }
-            }
-
-            if (validation.hasErrors()) {
+            if(validation.hasErrors()) {
                 validation.keep();
                 erro();
             } else {
+                if (parametro.tipoSequenciaAlfa == 1) {
+                    //entao é texto, gera o arquivo
+                    alfa = ProcessamentoBean.uploadText(ConvertFASTA2txt.converter(parametro.textoAlfa));
+                } else {
+                    Boolean fasta = (ConvertFASTA2txt.converter(parametro.alfa, localEntrada + "/" + parametro.alfa.getName()));
+                    alfa = ValidCharDNA.validar(localEntrada + "/" + parametro.alfa.getName());
+                    alfa.nome = parametro.alfa.getName();
+                    alfa.fasta = fasta;
+                }
 
-                Long id = ProcessamentoBean.processamento(parametro, alfa, betas);
-                result(id);
+                if (parametro.tipoSequenciaBeta == 1) {
+                    //então é texto, gera o arquivo
+                    Arquivo beta = ProcessamentoBean.uploadText(ConvertFASTA2txt.converter(parametro.textoBeta));
+                    betas.add(beta);
+                } else {
+                    for (File f : parametro.beta) {
+                        System.out.println(f.getName());
+                        Boolean fasta = (ConvertFASTA2txt.converter(f, localEntrada + "/" + f.getName()));
+                        Arquivo bt = ValidCharDNA.validar(localEntrada + "/" + f.getName());
+                        Arquivo beta = new Arquivo();
+                        beta.nome = f.getName();
+                        beta.local = bt.local;
+                        beta.quantidadeCaracteres = bt.quantidadeCaracteres;
+                        beta.sequencia = bt.sequencia;
+                        beta.fasta = fasta;
+                        betas.add(beta);
+                        bt = null;
+                    }
+                }
+
+                if (alfa.quantidadeCaracteres < parametro.k) {
+                    validation.addError("Erro", "A quantidade de diferenças (k) não pode ser maior que a quantidade de caracteres da sequência alvo");
+                }
+
+                if (!parametro.tipoProcessamento) {
+                    if (parametro.jInicio < 1) { //se o j for igual a distancia esta errado
+                        validation.addError("Erro", "A posição de início não pode ser menor que 1, que é a posição inicial da sequência alvo!");
+                    }
+
+                    if (parametro.jInicio == parametro.jFim) { //se o j for igual a distancia esta errado
+                        validation.addError("Erro", "A posição de início não pode ser igual à posição de fim da sequência alvo!");
+                    }
+                    if (parametro.jInicio > (alfa.quantidadeCaracteres - 1)) {
+                        validation.addError("Erro", "A posição de início deve estar no intervalo entre 1 e "
+                                + (alfa.quantidadeCaracteres - 1) + "!");
+                    }
+                    if (parametro.jFim > alfa.quantidadeCaracteres) {
+                        validation.addError("Erro", "A posição de fim deve estar no intervalo entre 2 e "
+                                + alfa.quantidadeCaracteres + ", que é o tamanho da sequência alvo!");
+                    }
+                }
+
+                if (parametro.mostrarDistancia) {
+                    if (parametro.distancia < 1) {
+                        validation.addError("Erro", "A distancia entre as ocorrências deve ser maior que 0!");
+                    }
+                    if (parametro.distancia >= alfa.quantidadeCaracteres) {
+                        validation.addError("Erro", "A distancia entre as ocorrências não " +
+                                "pode ser maior ou igual ao tamanho da sequência alvo!");
+                    }
+                }
+
+                if (parametro.mostrarLimiteCaracteres) {
+                    if (parametro.limiteCaracteres < 1) {
+                        validation.addError("Erro", "O limite de caracteres na ocorrência deve ser maior que 0!");
+                    }
+                    if (parametro.limiteCaracteres >= alfa.quantidadeCaracteres) {
+                        validation.addError("Erro", "O limite de caracteres na ocorrência não " +
+                                "pode ser maior ou igual ao tamanho da sequência alvo!");
+                    }
+                }
+
+                if (validation.hasErrors()) {
+                    validation.keep();
+                    erro();
+                } else {
+
+                    Long id = ProcessamentoBean.processamento(parametro, alfa, betas);
+                    result(id);
+                }
             }
         }
     }
@@ -107,23 +183,6 @@ public class Application extends Controller {
         System.out.println(processamentoId + ", " + j);
         Resultado resultado = Resultado.getResultadoPorProcessamento(processamentoId, j);
         render(resultado);
-    }
-
-    public static void diagonal(){
-        List<LCE> lista = new ArrayList<LCE>();
-        String alfa = "CCCGGCCC";
-        String beta = "CCCGTGCCC";
-
-        for(Integer i = 0; i < alfa.length() - 1; i++){
-            for(Integer j = 0; j < beta.length() - 1; j++){
-                Integer lce = LCE.lce(alfa.toCharArray(), beta.toCharArray(), i, j);
-                if(lce > 1){
-                    lista.add(new LCE(i, j, lce));
-                }
-            }
-        }
-
-        render(lista);
     }
 
     public static void ocorrencia(Long id){
@@ -257,7 +316,4 @@ public class Application extends Controller {
             erro();
         }
     }
-
-
-
 }

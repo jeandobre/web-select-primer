@@ -3,6 +3,7 @@ package models;
 import controllers.Application;
 import play.Play;
 import play.db.jpa.GenericModel;
+import play.db.jpa.JPA;
 import play.db.jpa.Model;
 
 import java.io.Serializable;
@@ -36,6 +37,8 @@ public class Resultado extends GenericModel {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "resultado", cascade = CascadeType.ALL)
     public Menor menor;
 
+    public Integer distancia;
+
     public static Resultado getResultadoPorProcessamento(Long processamentoId, Integer j){
         return find("processamento.id = :processamentoId and ocorrencia.j = :j")
                 .setParameter("processamentoId", processamentoId)
@@ -43,9 +46,14 @@ public class Resultado extends GenericModel {
     }
 
     public static List<Resultado> todosResultadosPorProcessamentoOrdem(Long processamentoId){
-        return find("processamento.id = :processamentoId ORDER BY ocorrencia.j ASC")
+        return  find("SELECT r FROM Resultado r JOIN FETCH r.ocorrencia " +
+                "WHERE r.processamento.id = :processamentoId ORDER BY r.ocorrencia.j ASC")
                 .setParameter("processamentoId", processamentoId)
                 .fetch();
+              /*  JPA.em().createNamedQuery("SELECT r FROM Resultado r JOIN FETCH r.ocorrencia " +
+                        "WHERE r.processamento.id = :processamentoId ORDER BY r.ocorrencia.j ASC")
+                        .setParameter("processamentoId", processamentoId)
+                .getResultList(); */
     }
 
     public static List<Resultado> todosResultadosPorProcessamentoOrdem(Long processamentoId, Integer pagina){
@@ -66,15 +74,16 @@ public class Resultado extends GenericModel {
     }
 
     public static List<Resultado> todosResultadosMaiores(Long processamentoId){
-        return find("processamento.id = :processamentoId AND maior.id > 0 ORDER BY ocorrencia.j ASC")
+        return find("SELECT r FROM Resultado r JOIN FETCH r.ocorrencia " +
+                "WHERE r.processamento.id = :processamentoId AND r.maior.id > 0 ORDER BY r.ocorrencia.j ASC")
                 .setParameter("processamentoId", processamentoId)
                 .fetch();
     }
 
     public static List<Resultado> todosResultadosMenores(Long processamentoId){
-        return find("processamento.id = :processamentoId AND menor.id > 0 ORDER BY ocorrencia.j ASC")
+        return find("SELECT r FROM Resultado r JOIN FETCH r.ocorrencia " +
+                "WHERE r.processamento.id = :processamentoId AND r.menor.id > 0 ORDER BY r.ocorrencia.j ASC")
                 .setParameter("processamentoId", processamentoId)
                 .fetch();
     }
-
 }

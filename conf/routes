@@ -35,7 +35,11 @@ GET     /processamento/beta/{ocorrenciaId}/txt           Application.gerarFileOc
 GET     /processamento/resultado/{resultadoId}/txt       Application.gerarFileResultado(resultadoId)
 
 
+
+GET   /computar  Application.computar
+
 # Ignore favicon requests
+
 GET     /favicon.ico                            404
 
 # Map static resources from the /app/public folder to the /public path
