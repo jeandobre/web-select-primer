@@ -323,3 +323,46 @@
   float: left;
   margin-left: 10px;
 }
+
+#files{
+  display: none;
+  width: 0px;
+  height : 0px;
+}
+
+.input-sequencia{
+  height: 70px;
+}
+
+.sequencia-file{
+  background-color: #ccc;
+  border-bottom: 1px solid #337ab7;
+  font-size: 11px;
+  display: inline;
+  padding: 1px;
+}
+
+.sequencia-nome{
+   font-weight: bold;
+   font-size: 10px;
+}
+
+.sequencia-well{
+  padding: 5px;
+}
+
+input[type=checkbox] + label {
+    color: #ccc;
+}
+
+input[type=checkbox] + input {
+
+}
+
+input[type=checkbox]:checked + label {
+    color: #000;
+}
+
+.jFiler-input{
+  border-radius: 0px !important;
+}

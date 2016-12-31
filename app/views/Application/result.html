@@ -2,7 +2,7 @@
 #{set title:'Web Primers [Resultado]' /}
 #{set pagina:'Resultado do processamento ' + processamento.id /}
 
-#{set 'controles'}
+  #{set 'controles'}
     <a id="novo" class="btn btn-primary" href="/">Novo processamento</a>
     #{if processamento.salvo == false}
         <a id="salvar" class="btn btn-success" href="/processamento/salvar/${processamento.id}">Guardar resultado</a>
@@ -11,8 +11,7 @@
     #{if processamento.salvo == true}
         <a id="recuperar" class="btn btn-default" href="/processamento">Recuperar resultado</a>
     #{/if}
-
-#{/set}
+  #{/set}
 
     <div class="panel">
         <label class="label label-default">Diferenças:</label>
@@ -24,6 +23,16 @@
         <label class="label label-default">Programa:</label>
         <span>${processamento.programa.nome}</span>
 
+        #{if (processamento.mostrarLimiteCaracteres || processamento.mostrarDistancia)}
+            <label class="label label-default">
+                <span class="glyphicon glyphicon-filter"></span>
+                Filtros:
+            </label>
+            #{if processamento.mostrarLimiteCaracteres}
+               <span class="label label-warning ">limite de ${processamento.limiteCaracteres} caracteres</span>
+            #{/if}
+            #{if processamento.mostrarDistancia} <span class="label label-warning">distância de ${processamento.distancia} entre ocorrências</span> #{/if}
+        #{/if}
         <!--<div class="info-nome">${processamento.nome}</div>-->
     </div>
 
@@ -58,9 +67,7 @@
 
     <div class="bloco">
       <span id="j"></span>
-      <div id="foo" style="width: ${processamento.alfaTamanho + 1}px">
-
-      </div>
+      <div id="foo" style="width: ${processamento.alfaTamanho + 1}px"></div>
 
       <div class="fundo-sequencia" style="width: ${processamento.alfaTamanho + 1}px">
          #{list items:resultados, as:'rs'}
@@ -69,7 +76,8 @@
                     #{if rs.menor} menor #{/if}
                     #{if rs.maior} maior #{/if}
                  #{/if}"
-                 #{if rs_isFirst} style="margin-left: ${rs.ocorrencia.j}px;" #{/if} ></div>
+                 #{if rs.ocorrencia.posicaoTela} style="margin-left: ${rs.ocorrencia.posicaoTela}px;" #{/if}
+                 data-distancia="${rs.distancia}"></div>
          #{/list}
       </div>
 
@@ -107,6 +115,9 @@
           <div class="panel-body">
             Posiçao: <label id="indice"></label>
             Tamanho: <label id="tamanho"></label>
+            #{if processamento.mostrarDistancia}
+               Distância de ${processamento.distancia} caracteres para a posição: <label id="distancia"></label>
+            #{/if}
             </br>
             Segmento: <label id="prime"></label>
           </div>
@@ -134,7 +145,7 @@
   function processa(id, j){
        $.getJSON( "/posicao/" + id + "/" + j, function( data ) {
            var r = data.tamanho;
-           var t = (j + (r - 6) );
+           var t = (j + (r - 6));
 
            $("#ocorrencia").css("margin-left", j + "px");
            $("#ocorrencia").css("width",r + "px");
@@ -175,17 +186,22 @@ $( document ).ready(function() {
     });
 
     $( ".sequencia" ).click( function( event ) {
-      $(".sequencia").removeClass('selected');
+       $(".sequencia").removeClass('selected');
        var j = $(this).data("j");
-      $(this).addClass('selected')
+       $(this).addClass('selected');
        processa(${processamento.id}, j);
+       if($(this).data("distancia") > 0){
+         $('[data-j=' + $(this).data("distancia") + ']').addClass('selected');
+         $('#distancia').html($(this).data("distancia"));
+       }
     });
 
-    processa(${processamento.id}, ${ocr.inicio});
+    $('[data-j=' + ${ocr.inicio} + ']').trigger('click');
 
     #{if processamento.mostrarMaiorMenor == true }
         $(".link-ocorrencia").click(function(){
-            processa(${processamento.id}, $(this).data( "j" ));
+           // processa(${processamento.id}, $(this).data( "j" ));
+            $('[data-j=' + $(this).data( "j" ) + ']').trigger('click');
         });
     #{/if}
 });

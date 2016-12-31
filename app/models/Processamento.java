@@ -52,14 +52,26 @@ public class Processamento extends GenericModel {
     @Column(name="mostrar_maior_menor")
     public Boolean mostrarMaiorMenor;
 
-    @Column(name="mostrar_entre_mil_dois_mil")
-    public Boolean mostrarEntreMilDoisMil;
+   /* @Column(name="mostrar_entre_mil_dois_mil")
+    public Boolean mostrarEntreMilDoisMil; */
 
-    @Column
-    public Integer posicao;
+    @Column(name = "j_inicio")
+    public Integer jInicio;
+
+    @Column(name = "j_fim")
+    public Integer jFim;
+
+    @Column(name = "mostrar_distancia")
+    public Boolean mostrarDistancia;
 
     @Column
     public Integer distancia;
+
+    @Column(name="mostrar_limite_caracteres")
+    public Boolean mostrarLimiteCaracteres;
+
+    @Column(name = "limite_caracteres")
+    public Integer limiteCaracteres;
 
     @Column
     public String processamento;
@@ -119,5 +131,13 @@ public class Processamento extends GenericModel {
         Long total = (Long) q1.setParameter("busca","%" + busca + "%").getSingleResult();
 
         return (int) Math.ceil( total / linhas );
+    }
+
+    public Resultado buscarResultadoPorPosicaoJ(Integer j){
+        for(Resultado re: resultados){
+            if(re.ocorrencia.j == j) return re;
+        }
+
+        return null;
     }
 }

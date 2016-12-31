@@ -34,8 +34,8 @@ GET     /processamento/excluir/{id}                      Application.excluir(id)
 GET     /processamento/beta/{ocorrenciaId}/txt           Application.gerarFileOcorrencia(ocorrenciaId)
 GET     /processamento/resultado/{resultadoId}/txt       Application.gerarFileResultado(resultadoId)
 
-
 # Ignore favicon requests
+
 GET     /favicon.ico                            404
 
 # Map static resources from the /app/public folder to the /public path

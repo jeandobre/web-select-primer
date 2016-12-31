@@ -14,116 +14,166 @@
 
     <div class="panel">
       <div class="panel-body">
-        <div class="form-group">
-          <label for="alfa" class="col-sm-2 control-label">Sequência alvo:</label>
-          <div class="col-sm-10">
-            <input id="alfa" type="file" class="form-control file" name="parametro.alfa">
-            <span class="help-block">Selecione um arquivo de texto de sequência de DNA.</span>
-          </div>
+        <div class="row">
+          <label class="control-label col-sm-2">Sequência alvo</label>
         </div>
-        <div class="form-group">
-          <label for="beta" class="col-sm-2 control-label">Sequência(s):</label>
-          <div class="col-sm-10">
-            <input id="beta" type="file" class="form-control file"
-                   name="parametro.beta" multiple="multiple" >
-            <span class="help-block">Selecione um arquivo de texto de sequência de DNA.</span>
+        <div class="row">
+          <div class="col-sm-6">
+              <div class="input-group">
+                <span class="input-group-addon">
+                  <input id="tipo-sequencia-alfa-file" type="radio" name="parametro.tipoSequenciaAlfa" value="2" checked >Arquivo
+                </span>
+                <input id="alfa" type="file" class="form-control" name="parametro.alfa" >
+              </div>
+          </div>
+          <div class="col-sm-6">
+              <div class="input-group">
+                <span class="input-group-addon">
+                   <input id="tipo-sequencia-alfa-texto" type="radio" name="parametro.tipoSequenciaAlfa" value="1" >Texto
+                </span>
+                <textarea id="alfa-texto" name="parametro.textoAlfa" placeholder="Digite a sequência..."
+                      rows="4" maxlength="1000" style="resize: none"
+                      class="form-control"></textarea>
+              </div>
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="row">
+             <label class="control-label col-sm-2">Sequência(s) para comparação</label>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-6">
+              <div class="input-group">
+                <span class="input-group-addon">
+                   <input id="tipo-sequencia-beta-file" type="radio" name="parametro.tipoSequenciaBeta" value="2" checked >Arquivo
+                </span>
+                <input id="beta" type="file" class="form-control" name="parametro.beta" multiple="multiple" >
+              </div>
+          </div>
+          <div class="col-sm-6">
+              <div class="input-group">
+                <span class="input-group-addon">
+                   <input id="tipo-sequencia-beta-texto" type="radio" name="parametro.tipoSequenciaBeta" value="1"  >Texto
+                </span>
+                <textarea id="beta-texto" name="parametro.textoBeta" placeholder="Digite a sequência..."
+                       rows="4" maxlength="1000" style="resize: none"
+                       class="form-control"></textarea>
+              </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top: 5px">
           <label for="k" class="col-sm-2 control-label">Diferenças:</label>
           <div class="col-sm-1">
             <input id="k" type="text" class="form-control" placeholder="1" name="parametro.k">
-            
           </div> 
-          <span class="help-block">Digite a quantidade de diferenças desejada para a o segmento da sequência alvo
-            com qualquer segmento de outras sequências.<br/>
+          <span class="help-block">Digite a quantidade de diferenças desejada.<br/>
           O valor deve estar entre 1 e o tamanho da sequência alvo.</span>
         </div>
       </div>
     </div>
 
     <div class="panel panel-default panel-info" style="margin: 10px;">
-      <div class="panel-heading">Opções</div>
+      <div class="panel-heading">Opções de processamento</div>
       <div class="panel-body">
 
         <div class="row">
           <div class="col-md-6">
-            <div class="bs-callout bs-callout-warning">
-              <h4>Tipos de sequência</h4>
+              <div class="bs-callout bs-callout-warning">
+                <h4>Tipos de sequência</h4>
+              </div>
+              <label class="radio-inline" style="margin-left: 25px">
+                <input type="radio" name="parametro.tipoSequencia" id="sequencia-diferente"
+                       data-toggle="tooltip" title="Sequências são bem diferentes"
+                       value="DIFERENTES" checked> Sequências diferentes
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="parametro.tipoSequencia" id="sequencia-semelhante"
+                       data-toggle="tooltip" title="Sequência são muito parecidas"
+                       value="PARECIDAS"> Sequências semelhantes
+              </label>
+              <label class="radio-inline">
+                <input type="radio" name="parametro.tipoSequencia" id="heuristica"
+                       data-toggle="tooltip" title="Heurística"
+                       value="HEURISTICA"> Heurística
+              </label>
+
+              <div class="bs-callout bs-callout-warning">
+                <h4>Tipo de processamento</h4>
+              </div>
+              <label class="radio" style="margin-left: 45px; font-weight: 400;">
+                <input type="radio" name="parametro.tipoProcessamento" id="todas-posicao" value="1"
+                       title="Processar todas as posições possíveis da sequência alvo">
+                Todas as posições da sequência alvo.
+              </label>
+              <label class="radio" style="margin-left: 45px; font-weight: 400;">
+                <input type="radio" name="parametro.tipoProcessamento" id="uma-posicao" value="2" checked
+                       title="Selecione um intervalo de posições que deverão ser processadas">
+                Intervalo de posições da sequência alvo.
+              </label>
+
+              <div class="form-group" id="opcoes" style="margin-left: 70px; font-weight: 400;">
+                  <label for="jInicio" class="control-label">Entre</label>
+
+                    <input id="jInicio" type="text" class="form-control" name="parametro.jInicio"
+                           style="width: 50px; display: inline"
+                           title="A posição de inicio de processamento da sequência alvo.">
+
+                  <label for="jFim" class="control-label">e</label>
+
+                    <input id="jFim" type="text" class="form-control"
+                           name="parametro.jFim" style="width: 60px; display: inline"
+                           title="A posição de fim de processamento da sequência alvo.">
+              </div>
+
+              <div class="checkbox" style="margin-left: 25px;">
+                <input type="checkbox" name="parametro.maiorMenor" id="maior-menor" value="True">
+                <label for="maior-menor" class="control-label" >Mostrar maior/menor ocorrência</label>
+              </div>
             </div>
-            <label class="radio-inline">
-              <input type="radio" name="parametro.tipoSequencia" id="sequencia-diferente"
-                     data-toggle="tooltip" title="Sequências são bem diferentes"
-                     value="DIFERENTES" checked> Sequências diferentes
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="parametro.tipoSequencia" id="sequencia-semelhante"
-                     data-toggle="tooltip" title="Sequência são muito parecidas"
-                     value="PARECIDAS"> Sequências semelhantes
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="parametro.tipoSequencia" id="heuristica"
-                     data-toggle="tooltip" title="Heurística"
-                     value="HEURISTICA"> Heurística
-            </label>
-          </div>
 
           <div class="col-md-6">
             <div class="bs-callout bs-callout-warning">
-              <h4>Posições</h4>
-            </div>
-            <div class="radio">
-              <input type="radio" name="parametro.tipoProcessamento" id="todas-posicao" value="1" >
-              Processar todas as posições possiveis.
-            </div>
-            <div class="radio">
-              <input type="radio" name="parametro.tipoProcessamento" id="uma-posicao" value="2" checked
-                     title="Selecione a posição de inicio e tamanho (quantidade de posições) que deverão ser processadas">
-              Selecionar uma posição e um tamanho.
+              <h4>
+                <span class="glyphicon glyphicon-filter"></span>
+                Filtros
+              </h4>
             </div>
 
-            <div class="form-group" id="opcoes">
-              <div>
-                <label for="j" class="col-sm-2 control-label">Posição:</label>
-                <div class="col-sm-2">
-                    <input id="posicao" type="text" class="form-control" name="parametro.j"
-                           title="A posição de inicio de processamento da sequência alvo.">
-                </div>
+            <div class="checkbox" style="margin-left: 25px;">
+              <input type="checkbox" name="parametro.mostrarDistancia" id="mostrar-distancia" />
+              <label for="mostrar-distancia" >Mostrar apenas ocorrências distantes
+                <input id="distancia" type="text" class="form-control" name="parametro.distancia"
+                       style="width: 50px; display: inline" /> uma da outra.
+              </label>
+            </div>
 
-                <label for="distancia" class="col-sm-2 control-label">Tamanho:</label>
-                <div class="col-sm-2">
-                    <input id="distancia" type="text" class="form-control"
-                           name="parametro.distancia"
-                           title="O tamanho ou quantidade de índices que serão processados apartir da posição.">
-                </div>
-              </div>
+            <div class="checkbox" style="margin-left: 25px;">
+              <input type="checkbox" name="parametro.mostrarLimiteCaracteres" id="limite-caracteres" />
+              <label for="limite-caracteres">Mostrar apenas ocorrências com tamanho até
+                <input type="text" class="form-control" name="parametro.limiteCaracteres"
+                       id="limite"
+                       style="width: 50px; display: inline" /> caracteres.</span>
+              </label>
             </div>
           </div>
-
-        </div>
-
-        <div class="row">
-          <div class="checkbox" style="margin-left: 25px;">
-            <label>
-              <input type="checkbox" name="parametro.regioesTamanhoFixo"> Devolver regiões de tamanho entre certos valores (1.000 a 2.000)
-            </label>
-          </div>
-
-          <div class="checkbox" style="margin-left: 25px;">
-            <label>
-              <input type="checkbox" name="parametro.maiorMenor"> Devolver maior/menor região
-            </label>
-          </div>
-
-        </div>
       </div>
     </div>
 
+      <input type="file" id="files" visbility="hidden" hidden />
   #{/form}
 
 <script>
         $( document ).ready(function() {
+
+          $('#alfa-texto').keypress(function(){
+             $('#tipo-sequencia-alfa-texto').attr('checked', true);
+          });
+          $('#beta-texto').keypress(function(){
+             $('#tipo-sequencia-beta-texto').attr('checked', true);
+          });
+
 
           $('[data-toggle="tooltip"]').tooltip();
 
@@ -152,10 +202,15 @@
               removeConfirmation: false
           });
 
-          $("#k, #posicao, #distancia").keypress(function (e) {
+          $("#k, #jInicio, #jFim, #distancia, #limite").on('keypress', function (e) {
             if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
                return false;
-             }
+            }
+          });
+
+          $('#distancia, #limite').on('keyup', function(){
+            $('#mostrar-distancia').prop('checked', $('#distancia').val().length > 0);
+            $('#limite-caracteres').prop('checked', $('#limite').val().length > 0);
           });
 
 

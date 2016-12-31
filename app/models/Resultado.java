@@ -36,6 +36,8 @@ public class Resultado extends GenericModel {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "resultado", cascade = CascadeType.ALL)
     public Menor menor;
 
+    public Integer distancia;
+
     public static Resultado getResultadoPorProcessamento(Long processamentoId, Integer j){
         return find("processamento.id = :processamentoId and ocorrencia.j = :j")
                 .setParameter("processamentoId", processamentoId)

@@ -10,10 +10,8 @@ import play.db.jpa.JPA;
 import play.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.io.PrintWriter;
+import java.util.*;
 
 /**
  * Created by jeandobre on 05/11/2016.
@@ -45,8 +43,8 @@ public class ProcessamentoBean {
         Integer i = 0;
 
         if (!parametro.tipoProcessamento) {
-            commandLine += " -j " + parametro.j + " " + parametro.distancia;
-            i = parametro.j;
+            commandLine += " -j " + parametro.jInicio + " " + (parametro.jFim - parametro.jInicio);
+            i = parametro.jInicio;
         }
 
         Processamento processamento = new Processamento();
@@ -56,9 +54,12 @@ public class ProcessamentoBean {
         processamento.alfaTamanho = alfa.quantidadeCaracteres;
         processamento.tipoSequencia = tipoSequencia;
         processamento.mostrarMaiorMenor = parametro.maiorMenor;
-        processamento.mostrarEntreMilDoisMil = parametro.regioesTamanhoFixo;
-        processamento.posicao = parametro.j;
+        processamento.mostrarDistancia = parametro.mostrarDistancia;
+        processamento.mostrarLimiteCaracteres = parametro.mostrarLimiteCaracteres;
+        processamento.jInicio = parametro.jInicio;
+        processamento.jFim = parametro.jFim;
         processamento.distancia = parametro.distancia;
+        processamento.limiteCaracteres = parametro.limiteCaracteres;
         processamento.betas = new ArrayList<ArquivoBeta>(betas.size());
         processamento.quantidadeDiferencas = parametro.k;
         processamento.programa = programa;
@@ -75,7 +76,7 @@ public class ProcessamentoBean {
 
             b.arquivoResultado = localSaida + "/out_" + saida;
             String argumento = " -b " + b.arquivo + " -sf " + b.arquivoResultado;
-            //System.out.println(commandLine + argumento);
+            System.out.println(commandLine + argumento);
             comando += commandLine + argumento + ";";
             execCommand(commandLine + argumento);
             saida++;
@@ -92,7 +93,8 @@ public class ProcessamentoBean {
             for (CandidatoPrimer cp : candidatos) {
                 Ocorrencia ocr = new Ocorrencia();
                 ocr.beta = beta;
-                ocr.j = cp.j + 1; //para não iniciar em zero
+                if(parametro.tipoProcessamento) ocr.j = cp.j + 1; //para não iniciar em zero
+                else ocr.j = cp.j;
                 ocr.r = cp.tamanho;
                 ocr.segmento = cp.sequencia;
                 beta.ocorrencias.add(ocr);
@@ -117,27 +119,67 @@ public class ProcessamentoBean {
             }
         }
 
+        //por ultimo, vamos agora fazer os filtros
+        List<Resultado> remover = new ArrayList<Resultado>();
+        if(processamento.mostrarLimiteCaracteres){
+            for(Resultado re: processamento.resultados){
+                if(re.ocorrencia.segmento.length() > processamento.limiteCaracteres)
+                    remover.add(re);
+                //removemos todas as ocorrências que tiveram o tamanho maior que o limite fixado
+            }
+            processamento.resultados.removeAll(remover);
+        }
+
+        remover.clear();
+        if(processamento.mostrarDistancia){
+            for(Resultado re: processamento.resultados) {
+                if(re.distancia != null && re.distancia > 0) continue;
+                Integer vv = re.ocorrencia.j;
+                Resultado dRe = processamento.buscarResultadoPorPosicaoJ(vv + processamento.distancia);
+                if (dRe == null){
+                    remover.add(re);
+                } else{
+                    dRe.distancia = vv;
+                    re.distancia = vv + processamento.distancia;
+                }
+            }
+            processamento.resultados.removeAll(remover);
+        }
+
         //encontrar o maior e o menor
         //primeiro tenho que encontrar o valor maior e menor
         processamento.maiorTamanho = 0;
         processamento.menorTamanho = processamento.alfaTamanho + 1; //pois não haverá nenhum maior que este tamanho
+        Integer posicaoTela = 1;
         for (Resultado re: processamento.resultados){
             if(re.ocorrencia.r > processamento.maiorTamanho) processamento.maiorTamanho = re.ocorrencia.r;
             if(re.ocorrencia.r < processamento.menorTamanho) processamento.menorTamanho = re.ocorrencia.r;
+            if(re.ocorrencia.j != posicaoTela + 1){
+                if(posicaoTela == 1) //isso é necessário por conta dos pixels na tela
+                  re.ocorrencia.posicaoTela = re.ocorrencia.j - posicaoTela;
+                else
+                    re.ocorrencia.posicaoTela = re.ocorrencia.j - posicaoTela - 1;
+                posicaoTela = re.ocorrencia.j;
+            } else posicaoTela++;
+            //se o valor for de 1 em 1 não guardo a posicao da tela,
         }
+
         //depois encontramos todos os resultados maiores e menores;
-        for (Resultado re: processamento.resultados){
-            if(re.ocorrencia.r == processamento.maiorTamanho){
-                Maior big = new Maior();
-                big.resultado = re;
-                re.maior = big;
-            }
-            if(re.ocorrencia.r == processamento.menorTamanho){
-                Menor small = new Menor();
-                small.resultado = re;
-                re.menor = small;
+        if(processamento.mostrarMaiorMenor) {
+            for (Resultado re : processamento.resultados) {
+                if (re.ocorrencia.r == processamento.maiorTamanho) {
+                    Maior big = new Maior();
+                    big.resultado = re;
+                    re.maior = big;
+                }
+                if (re.ocorrencia.r == processamento.menorTamanho) {
+                    Menor small = new Menor();
+                    small.resultado = re;
+                    re.menor = small;
+                }
             }
         }
+
         calendar = Calendar.getInstance();
         processamento.fim = calendar.getTime();
         long diff =  processamento.fim.getTime() - processamento.inicio.getTime();
@@ -160,4 +202,43 @@ public class ProcessamentoBean {
             e.printStackTrace();
         }
     }
+
+    public static String randomIdentifier() {
+        final String lexicon = "ABCDEFGHIJKLMNOPQRSTUVWXYZ12345674890";
+        final java.util.Random rand = new java.util.Random();
+        final Set<String> identifiers = new HashSet<String>();
+
+        StringBuilder builder = new StringBuilder();
+        while(builder.toString().length() == 0) {
+            int length = rand.nextInt(5)+5;
+            for(int i = 0; i < length; i++) {
+                builder.append(lexicon.charAt(rand.nextInt(lexicon.length())));
+            }
+            if(identifiers.contains(builder.toString())) {
+                builder = new StringBuilder();
+            }
+        }
+        return builder.toString();
+    }
+
+    public static Arquivo uploadText(String sequencia){
+        final String localEntrada = Configuracao.getValor("diretorio.entrada");
+
+        Arquivo arquivo = new Arquivo();
+        arquivo.nome = randomIdentifier();
+        arquivo.local = localEntrada + "/" + arquivo.nome;
+        arquivo.quantidadeCaracteres = sequencia.length();
+        arquivo.fasta = false;
+        arquivo.sequencia = sequencia;
+
+        try{
+            PrintWriter writer = new PrintWriter(arquivo.local, "UTF-8");
+            writer.println(sequencia);
+            writer.close();
+        } catch (IOException e) {
+            // do something
+        }
+        return arquivo;
+    }
+
 }

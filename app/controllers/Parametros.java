@@ -6,16 +6,14 @@ import play.data.validation.Min;
 import play.data.validation.Required;
 import play.mvc.*;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 
 public class Parametros{
-   @Required
-   @NotNull
+
    public File alfa;
 
-   @Required
-   @NotNull
    public File[] beta;
 
    @Required
@@ -25,25 +23,44 @@ public class Parametros{
 
    public Boolean tipoProcessamento;
 
-   @Min(0)
-   public Integer j;
+   @Min(1)
+   public Integer jInicio;
+   public Integer jFim;
+   @Min(1)
    public Integer distancia;
+   public Integer limiteCaracteres;
 
    public TipoSequencia tipoSequencia;
 
    public Boolean maiorMenor = false;
-   public Boolean regioesTamanhoFixo;
+   public Boolean mostrarDistancia = false;
+   public boolean mostrarLimiteCaracteres = false;
 
-   @java.lang.Override
-   public java.lang.String toString() {
+   public Integer tipoSequenciaAlfa; //1 - texto e 2 - Arquivo
+   public Integer tipoSequenciaBeta;
+
+   public String textoAlfa;
+   public String textoBeta;
+
+   @Override
+   public String toString() {
       return "Parametros{" +
               "alfa=" + alfa +
-              ", beta=" + beta +
+              ", beta=" + Arrays.toString(beta) +
               ", k=" + k +
               ", tipoProcessamento=" + tipoProcessamento +
-              ", j=" + j +
+              ", jInicio=" + jInicio +
+              ", jFim=" + jFim +
               ", distancia=" + distancia +
+              ", limiteCaracteres=" + limiteCaracteres +
               ", tipoSequencia=" + tipoSequencia +
+              ", maiorMenor=" + maiorMenor +
+              ", mostrarDistancia=" + mostrarDistancia +
+              ", mostrarLimiteCaracteres=" + mostrarLimiteCaracteres +
+              ", tipoSequenciaAlfa=" + tipoSequenciaAlfa +
+              ", tipoSequenciaBeta=" + tipoSequenciaBeta +
+              ", textoAlfa='" + textoAlfa + '\'' +
+              ", textoBeta='" + textoBeta + '\'' +
               '}';
    }
 }
