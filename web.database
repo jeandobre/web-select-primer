@@ -575,3 +575,63 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 -- PostgreSQL database dump complete
 --
 
+CREATE TABLE public.programas
+(
+  id integer NOT NULL DEFAULT nextval('programas_id_seq'::regclass),
+  nome character varying(250),
+  local text,
+  tipo_sequencia character varying(20),
+  versao character varying(10),
+  ativo boolean NOT NULL DEFAULT true,
+  parametros character varying(40),
+  CONSTRAINT programas_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.programas
+  OWNER TO postgres;
+
+CREATE TABLE public.configuracoes
+(
+  key character varying(40) NOT NULL,
+  valor character varying,
+  CONSTRAINT configuracoes_pkey PRIMARY KEY (key)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.configuracoes
+  OWNER TO postgres;
+
+
+
+#DADOS
+
+
+COPY programas (id, nome, local, tipo_sequencia, versao, ativo, parametros) FROM stdin;
+1	kdifferenceprime1	C:/Users/jeandobre/Documents/Mestrado/Bioinformática/k-difference-prime/kdifferenceprime1.exe	DIFERENTES	2.0	t	-vs1
+2	kdifferenceprime2	C:/Users/jeandobre/Documents/Mestrado/Bioinformática/k-difference-prime/kdifferenceprime2.exe	PARECIDAS	2.0	t	-vs1
+3	kdifferenceprime1	/home/jeandobre/k-difference-prime/kdifferenceprime1	DIFERENTES	2.0	t	-vs1
+4	kdifferenceprime2	/home/jeandobre/k-difference-prime/kdifferenceprime2	PARECIDAS	2.0	t	-vs1
+\.
+
+
+--
+-- Name: programas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('programas_id_seq', 4, true);
+
+
+COPY configuracoes (key, valor) FROM stdin;
+diretorio.entrada.linux	/home/jeandobre/k-difference-prime/dados
+diretorio.entrada.windows	C:/Users/jeandobre/Documents/Mestrado/Bioinformática/k-difference-prime/dados
+sequencia.diferente.windows	1
+sequencia.parecida.windows	2
+sequencia.parecida.linux	4
+sequencia.diferente.linux	3
+sequencia.heuristica.windows	\N
+sequencia.heuristica.linux	\N
+diretorio.saida.windows	C:/Users/jeandobre/Documents/Mestrado/Bioinformática/k-difference-prime/saida
+diretorio.saida.linux	/home/jeandobre/k-difference-prime/saida
