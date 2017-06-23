@@ -27,6 +27,11 @@
 
 .letra{
   width: 10px;
+  font-size: 10px;
+  text-align: center;
+  line-height: 20px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .sequencia:hover{
@@ -35,6 +40,7 @@
 
 .sequencia span{
   display: none;
+  line-height: 10px;
 }
 
 .sequencia .letra{
@@ -46,12 +52,13 @@
 }
 
 .ocorrencia{
-   background-color: #f0ad4e;
    height: 12px;
    clear:left;
    position:relative;
    border-left: 1px solid #777;
    border-right: 1px solid #777;
+   border-bottom: 3px solid blue;
+   margin-top:5px;
 }
 
 .page-header{
@@ -64,31 +71,74 @@
    color: #aa6708;
 }
 
+.row{
+	margin-right: 0px;
+	margin-left: 0px;
+}
+
+.lbl{
+	font-size: 14px;
+	color:#787878;
+}
+
 .panel{
   margin-bottom: 10px !important;
-  margin-left: 15px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .panel-body{
    padding: 5px !important;
 }
 
+.panel-heading{
+	padding: 2px;
+}
+
+hr{
+	border: 1px solid #eee;
+	margin: 0px;
+	margin-bottom: 5px;
+}
+
+.help{
+	margin-left: 5px;
+	background-image: url('/public/images/help.png');
+	height: 16px;
+	width: 16px;
+	float: right;
+}
+
+.help:hover{
+    text-decoration: none;   
+}
+
+.bloco-head{
+	background-color: #f8f1f1; 
+	margin-bottom: 0px !important;
+	border-radius: 0px;
+}
+
 .bloco{
   overflow-x: auto;
   white-space: nowrap;
   overflow-y: hidden;
-  border: 1px solid #286090;
-  background-color: #ebf3fa;
-  height: 90px;
-  margin: 0 5px 0 5px;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  background-color: white;
+  height: 100px;
+  margin-left: 10px;
+  margin-right: 10px;
   clear: both;
+  margin-bottom: 5px;
 }
 
 #j{
    font-size: 10px;
    color: #777;
-   float: left;
-   clear: both;
+   position: relative;
+   top: -20px;
 }
 
 #r{
@@ -145,6 +195,10 @@
   background-color: #5cb85c;
 }
 
+.alert{
+	margin: 30px;
+}
+
 .alert ul{
 
 }
@@ -167,19 +221,46 @@
 }
 
 .head{
-
+   position: fixed;
+   display: block;
+   height: 95px;
+   width: 100%;
+   background-color: white;
+   z-index: 1000;
+   left: 0;
+   -moz-box-shadow: 0px 1px 10px #777;
+   -webkit-box-shadow: 0px 1px 10px #777;
+   box-shadow: 0px 1px 10px #777;
 }
 
-.head .logo{
-  display: inline-block;
-  width: 390px;
-  border-right: 1px dotted #ccc;
-  margin-right: 15px;
+.head .page-header{
+   margin: 0px;
+   
+}
+
+.head .page-header p{
+	font-size: 12px;
+	color: #3c3939;
 }
 
 .head .logo img{
-   margin: 6px;
-   float: left;
+   margin: 3px;
+   float: left;   
+}
+
+.head h1{
+	font-size: 16px;
+	font-weight: bold;
+	color: #FFFFFF;
+	margin-top: 5px;
+	background-color: #3573AA;
+	top: 0;
+	margin-bottom: 3px;
+}
+
+.head  small{
+	color: white;
+	margin-left: 30px;
 }
 
 .head .info {
@@ -206,6 +287,8 @@
    padding-left: 8px;
    color: #777;
    padding-top: 3px;
+   font-weight: bold;
+   margin-left: 5px;
 }
 
 .direitos{
@@ -216,6 +299,7 @@
 
 .link-ocorrencia{
    cursor: pointer;
+   font-size: 10px;
 }
 
 .config .btn{
@@ -268,16 +352,6 @@
    width: 300px;
 }
 
-.head{
-   position: fixed;
-   display: block;
-   height: 170px;
-   width: 100%;
-   background-color: white;
-   z-index: 1000;
-   left: 0;
-}
-
 .body{
    top: 180px;
    display: block;
@@ -295,14 +369,11 @@
 
 .zoom{
   right: 0;
-  border: 1px solid #286090;
-  width: 80px;
+  border-left: 1px solid #ddd;
+  display: inline-block;
   float: right;
-  background-color: #ebf3fa;
-  margin-right: 5px;
-  padding: 2px;
-  position: relative;
-  top: 1px;
+  /* margin-top: 3px; */
+  padding: 10px;
 }
 
 .sequencia-alfa-bloco{
@@ -375,6 +446,14 @@ input[type=checkbox]:checked + label {
     color: #000;
 }
 
+.jFiler-items-default .jFiler-item-assets a:hover{
+	text-decoration: none;
+}
+
+.jFiler{
+	margin-top: 2px;
+}
+
 .jFiler-input{
   border-radius: 0px !important;
   margin: 0px !important;
@@ -382,4 +461,80 @@ input[type=checkbox]:checked + label {
 
 .jFiler-item{
   border-bottom: 1px solid #ccc;
+}
+
+
+.load{
+	margin: 10px;
+	float: left;	
+}
+
+#valor{
+	font-size:12px;
+}
+
+.span-resultado{
+	font-size: 12px;
+	color: #777;
+}
+
+.botao-maior{
+	float: left;	
+}
+
+.botao-maior, .botao-menor{
+	margin: 1px;
+	border-right: 1px solid #ddd;
+	padding-right: 2px;
+	margin-left: 3px;
+	display: inline-block;
+}
+
+.badge{
+	margin-top: 5px;
+	font-size: 10px;
+}
+
+.regua{
+	font-size: 9px;
+	font-family: text;
+	display: inline-block;
+	width: 100px;
+	border-left: 1px solid #bbb;
+	margin: 0px;
+	height: 20px;
+	padding: 0px;
+	padding-left: 2px;
+	background: url('/public/images/regua.png') no-repeat;
+	float: left;
+}
+
+.primeira{
+	width: 99px;
+}
+
+.fim{
+	border-right: 1px solid #bbb;
+}
+
+
+#letra{
+	width: 0px;
+}
+
+.tooltip-inner{
+	max-width: none;
+}
+
+.zoom-meio{
+	background-color: #cccccc;
+	width: 50px;	
+}
+
+.zoom .btn-group .btn{
+	border: 1px solid #286090;
+}
+
+#table td{
+	padding: 2px;	
 }

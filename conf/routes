@@ -34,6 +34,15 @@ GET     /processamento/excluir/{id}                      Application.excluir(id)
 GET     /processamento/beta/{ocorrenciaId}/txt           Application.gerarFileOcorrencia(ocorrenciaId)
 GET     /processamento/resultado/{resultadoId}/txt       Application.gerarFileResultado(resultadoId)
 
+
+GET     /lce     Application.computarLCE
+
+
+# Configuração
+
+GET     /config   Application.config
+
+
 # Ignore favicon requests
 
 

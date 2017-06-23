@@ -36,10 +36,11 @@
         </table>
     </div>
 </div>
+
 <script>
     $( document ).ready(function (){
 
-       $(".head").css("height", "195px");
+       $(".head").css("height", "120px");
 
        $(".selecionar").click(function(){
            $('.div-ajax-carregamento-pagina').show();
@@ -47,8 +48,9 @@
 
         function carregar(busca, pagina){
            $('.div-ajax-carregamento-pagina').show();
-
+           $('#table tr:last').data("liberado", 0);   
            $.getJSON( "/processamento-json/" + busca + "/" + pagina, function( data ) {
+        	   
                var restante = data.restante;
                for (var i = 0; i < data.lista.length; i++) {
                    var texto = '<tr data-linha-id="' + data.lista[i].id + '">';
@@ -71,46 +73,56 @@
                        texto +='   title="Clique aqui para excluir os resultados deste processamento">';
                        texto +='   <span class="glyphicon glyphicon-trash"></span></a></td></tr>';
 
-                    $('#table').find('tbody').append(texto);
+                  $('#table').find('tbody').append(texto);
+               }
+               $('#table tr:last').data("restante", restante);
+               $('#table tr:last').data("pagina", pagina+1);                             
+               $('#table tr:last').data("liberado", 1); 
 
-                    $('.div-ajax-carregamento-pagina').hide();
+               $('.div-ajax-carregamento-pagina').hide();
 
-                    $(".excluir").unbind('click');
+               $(".excluir").unbind('click');
 
-                    $(".excluir").click(function(){
-                      var id = $(this).data("id");
-                      if(confirm('Deseja realmente excluir definitivamente os resultados do processamento ' + id + '?')){
-                         $('.div-ajax-carregamento-pagina').show();
-                         $.ajax({
-                          url: "/processamento/excluir/" + id,
-                          context: document.body
-                        }).done(function() {
-                           $('[data-linha-id=' + id + ']').hide();
-                           $('.div-ajax-carregamento-pagina').hide();
-                        });
-                      }
+               $(".excluir").click(function(){
+                  var id = $(this).data("id");
+                  if(confirm('Deseja realmente excluir definitivamente os resultados do processamento ' + id + '?')){
+                     $('.div-ajax-carregamento-pagina').show();
+                     $.ajax({
+                      url: "/processamento/excluir/" + id,
+                      context: document.body
+                    }).done(function() {
+                       $('[data-linha-id=' + id + ']').hide();
+                       $('.div-ajax-carregamento-pagina').hide();
                     });
-                }
-
-                $('.body').unbind('scroll');
-                if(restante > 0){
-                    $('.body').scroll(function(){
-
-                      if($('#table').height() - $('.body').scrollTop() == 442)
-                        carregar(busca, pagina + 1);
-                    });
-                }
-           });
+                  }
+               });
+           });     
         }
 
-        carregar(" ", 1);
+        $('.body').scroll(function(){
+            var obj = $('#table tr:last');
+            var restante = obj.data("restante");
+            var altura =   obj.offset().top;
+            var pagina =   obj.data("pagina");
 
+            var tela = $('.body').height() + $('.body').offset().top;
+
+            var liberado = obj.data("liberado");
+            
+            if(liberado === 1 && restante > 0 && altura < tela){
+            	var busca = $("#busca").val();
+                carregar(busca, pagina);
+            }    
+         });
+       
         $("#bt-busca").click(function(){
            $('.div-ajax-carregamento-pagina').show();
            $('#table tbody').empty();
            var busca = $("#busca").val();
            carregar(busca, 1);
         });
+
+        carregar(" ", 1);
     });
 
 </script>

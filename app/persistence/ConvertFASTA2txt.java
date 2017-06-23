@@ -5,6 +5,9 @@ import java.io.*;
 public class ConvertFASTA2txt {
 
 	public static String converter(String texto){
+		//TODO sempre olhar se a pasta de envio de texto ter permissao
+		//System.out.println(texto);
+		
 		BufferedReader br = new BufferedReader(new StringReader(texto));
 		String retorno = "";
 		try{
@@ -18,6 +21,7 @@ public class ConvertFASTA2txt {
 		}catch(IOException ioe){
 			ioe.printStackTrace();
 		}
+		//System.out.println(retorno);
 		return retorno;
 	}
 	

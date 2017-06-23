@@ -14,9 +14,10 @@ public class CandidatoPrimer {
     public Integer tamanho;
     public String sequencia;
 
-    static public List<CandidatoPrimer> computaResultado(String file){
+    static public List<CandidatoPrimer> computaResultado(String file, String alfa){
         List<CandidatoPrimer> candidatoPrimers = new ArrayList<CandidatoPrimer>();
         try{
+        	int plus = 0; 
             BufferedReader br = new BufferedReader(new FileReader(file));
             int count = 0;
             while(br.ready()){
@@ -28,8 +29,11 @@ public class CandidatoPrimer {
                 CandidatoPrimer r = new CandidatoPrimer();
                 String gg[] = linha.split(";");
                 r.j = Integer.valueOf( gg[0] );
+                if(r.j == 0) plus = 1;
+                r.j += plus;
                 r.tamanho = Integer.valueOf( gg[1] );
-                r.sequencia = gg[2];
+                //r.sequencia = gg[2];
+                r.sequencia = alfa.substring(r.j-1, r.j-1 + r.tamanho);
                 candidatoPrimers.add(r);
             }
             br.close();

@@ -1,583 +1,85 @@
---
--- PostgreSQL database dump
---
+CREATE TABLE public.betas
+(
+  id serial NOT NULL,
+  processamento_id integer,
+  nome character varying(230),
+  arquivo text,
+  tamanho integer,
+  arquivo_resultado character varying,
+  posicao integer,
+  CONSTRAINT betas_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
 
--- Dumped from database version 9.4.5
--- Dumped by pg_dump version 9.4.5
--- Started on 2016-11-06 20:59:04 AMST
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-
---
--- TOC entry 184 (class 3079 OID 11897)
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- TOC entry 2107 (class 0 OID 0)
--- Dependencies: 184
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
-
-SET search_path = public, pg_catalog;
-
-SET default_tablespace = '';
-
-SET default_with_oids = false;
-
---
--- TOC entry 175 (class 1259 OID 16399)
--- Name: betas; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE betas (
-    id integer NOT NULL,
-    processamento_id integer,
-    nome character varying(230),
-    arquivo text,
-    tamanho integer
+CREATE TABLE public.configuracoes
+(
+  key character varying(40) NOT NULL,
+  valor character varying,
+  CONSTRAINT configuracoes_pkey PRIMARY KEY (key)
+)
+WITH (
+  OIDS=FALSE
 );
 
 
-ALTER TABLE betas OWNER TO postgres;
-
---
--- TOC entry 174 (class 1259 OID 16397)
--- Name: betas_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE betas_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE betas_id_seq OWNER TO postgres;
-
---
--- TOC entry 2108 (class 0 OID 0)
--- Dependencies: 174
--- Name: betas_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE betas_id_seq OWNED BY betas.id;
-
-
---
--- TOC entry 181 (class 1259 OID 16451)
--- Name: maiores; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE maiores (
-    id integer NOT NULL,
-    resultado_id integer
+CREATE TABLE public.ocorrencias
+(
+  id serial NOT NULL DEFAULT,
+  beta_id integer,
+  j integer,
+  r integer,
+  segmento text,
+  letra character varying(1),
+  posicao_tela integer,
+  CONSTRAINT ocorrencias_pkey PRIMARY KEY (id),
+  CONSTRAINT ocorrencias_beta_id_fkey FOREIGN KEY (beta_id)
+      REFERENCES public.betas (id) MATCH SIMPLE
+      ON UPDATE RESTRICT ON DELETE RESTRICT,
+  CONSTRAINT ocorrencias_beta_id_j_key UNIQUE (beta_id, j)
+)
+WITH (
+  OIDS=FALSE
 );
 
-
-ALTER TABLE maiores OWNER TO postgres;
-
---
--- TOC entry 180 (class 1259 OID 16449)
--- Name: maiores_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE maiores_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE maiores_id_seq OWNER TO postgres;
-
---
--- TOC entry 2109 (class 0 OID 0)
--- Dependencies: 180
--- Name: maiores_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE maiores_id_seq OWNED BY maiores.id;
-
-
---
--- TOC entry 183 (class 1259 OID 16469)
--- Name: menores; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE menores (
-    id integer NOT NULL,
-    resultado_id integer
+CREATE TABLE public.processamentos
+(
+  id serial NOT NULL DEFAULT,
+  inicio timestamp with time zone,
+  fim timestamp with time zone,
+  tempo_gasto_segundos integer,
+  alfa_nome character varying(230),
+  alfa_arquivo character varying(300),
+  alfa_tamanho integer,
+  mostrar_maior_menor boolean,
+  mostrar_entre_mil_dois_mil boolean,
+  posicao integer,
+  distancia integer,
+  processamento text,
+  nome character varying(230),
+  informacao text,
+  salvo boolean NOT NULL DEFAULT false,
+  programa_id integer,
+  quantidade_diferencas integer NOT NULL DEFAULT 1,
+  maior_tamanho integer,
+  menor_tamanho integer,
+  mostrar_distancia boolean,
+  mostrar_limite_caracteres boolean,
+  j_inicio integer,
+  j_fim integer,
+  limite_caracteres integer,
+  tipo_sequencia character varying(20),
+  CONSTRAINT processamentos_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
 );
 
-
-ALTER TABLE menores OWNER TO postgres;
-
---
--- TOC entry 182 (class 1259 OID 16467)
--- Name: menores_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE menores_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE menores_id_seq OWNER TO postgres;
-
---
--- TOC entry 2110 (class 0 OID 0)
--- Dependencies: 182
--- Name: menores_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE menores_id_seq OWNED BY menores.id;
-
-
---
--- TOC entry 177 (class 1259 OID 16410)
--- Name: ocorrencias; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE ocorrencias (
-    id integer NOT NULL,
-    beta_id integer,
-    j integer,
-    r integer,
-    segmento text
-);
-
-
-ALTER TABLE ocorrencias OWNER TO postgres;
-
---
--- TOC entry 176 (class 1259 OID 16408)
--- Name: ocorrencias_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE ocorrencias_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE ocorrencias_id_seq OWNER TO postgres;
-
---
--- TOC entry 2111 (class 0 OID 0)
--- Dependencies: 176
--- Name: ocorrencias_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE ocorrencias_id_seq OWNED BY ocorrencias.id;
-
-
---
--- TOC entry 172 (class 1259 OID 16385)
--- Name: processamentos; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE processamentos (
-    id integer NOT NULL,
-    inicio timestamp with time zone,
-    fim timestamp with time zone,
-    tempo_gasto_segundos integer,
-    alfa_nome character varying(230),
-    alfa_arquivo character varying(300),
-    alfa_tamanho integer,
-    tipo_sequencia integer,
-    mostrar_maior_menor boolean,
-    mostrar_entre_mil_dois_mil boolean,
-    posicao integer,
-    distancia integer,
-    processamento text,
-    nome character varying(230),
-    informacao text
-);
-
-
-ALTER TABLE processamentos OWNER TO postgres;
-
---
--- TOC entry 173 (class 1259 OID 16388)
--- Name: processamentos_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE processamentos_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE processamentos_id_seq OWNER TO postgres;
-
---
--- TOC entry 2112 (class 0 OID 0)
--- Dependencies: 173
--- Name: processamentos_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE processamentos_id_seq OWNED BY processamentos.id;
-
-
---
--- TOC entry 179 (class 1259 OID 16426)
--- Name: resultados; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
---
-
-CREATE TABLE resultados (
-    id integer NOT NULL,
-    processamento_id integer,
-    ocorrencia_id integer
-);
-
-
-ALTER TABLE resultados OWNER TO postgres;
-
---
--- TOC entry 2113 (class 0 OID 0)
--- Dependencies: 179
--- Name: COLUMN resultados.id; Type: COMMENT; Schema: public; Owner: postgres
---
-
-COMMENT ON COLUMN resultados.id IS 'se';
-
-
---
--- TOC entry 178 (class 1259 OID 16424)
--- Name: resultados_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE resultados_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE resultados_id_seq OWNER TO postgres;
-
---
--- TOC entry 2114 (class 0 OID 0)
--- Dependencies: 178
--- Name: resultados_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE resultados_id_seq OWNED BY resultados.id;
-
-
---
--- TOC entry 1955 (class 2604 OID 16402)
--- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY betas ALTER COLUMN id SET DEFAULT nextval('betas_id_seq'::regclass);
-
-
---
--- TOC entry 1958 (class 2604 OID 16454)
--- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY maiores ALTER COLUMN id SET DEFAULT nextval('maiores_id_seq'::regclass);
-
-
---
--- TOC entry 1959 (class 2604 OID 16472)
--- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY menores ALTER COLUMN id SET DEFAULT nextval('menores_id_seq'::regclass);
-
-
---
--- TOC entry 1956 (class 2604 OID 16413)
--- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY ocorrencias ALTER COLUMN id SET DEFAULT nextval('ocorrencias_id_seq'::regclass);
-
-
---
--- TOC entry 1954 (class 2604 OID 16390)
--- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY processamentos ALTER COLUMN id SET DEFAULT nextval('processamentos_id_seq'::regclass);
-
-
---
--- TOC entry 1957 (class 2604 OID 16429)
--- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY resultados ALTER COLUMN id SET DEFAULT nextval('resultados_id_seq'::regclass);
-
-
---
--- TOC entry 2091 (class 0 OID 16399)
--- Dependencies: 175
--- Data for Name: betas; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY betas (id, processamento_id, nome, arquivo, tamanho) FROM stdin;
-\.
-
-
---
--- TOC entry 2115 (class 0 OID 0)
--- Dependencies: 174
--- Name: betas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('betas_id_seq', 1, false);
-
-
---
--- TOC entry 2097 (class 0 OID 16451)
--- Dependencies: 181
--- Data for Name: maiores; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY maiores (id, resultado_id) FROM stdin;
-\.
-
-
---
--- TOC entry 2116 (class 0 OID 0)
--- Dependencies: 180
--- Name: maiores_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('maiores_id_seq', 1, false);
-
-
---
--- TOC entry 2099 (class 0 OID 16469)
--- Dependencies: 183
--- Data for Name: menores; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY menores (id, resultado_id) FROM stdin;
-\.
-
-
---
--- TOC entry 2117 (class 0 OID 0)
--- Dependencies: 182
--- Name: menores_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('menores_id_seq', 1, false);
-
-
---
--- TOC entry 2093 (class 0 OID 16410)
--- Dependencies: 177
--- Data for Name: ocorrencias; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY ocorrencias (id, beta_id, j, r, segmento) FROM stdin;
-\.
-
-
---
--- TOC entry 2118 (class 0 OID 0)
--- Dependencies: 176
--- Name: ocorrencias_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('ocorrencias_id_seq', 1, false);
-
-
---
--- TOC entry 2088 (class 0 OID 16385)
--- Dependencies: 172
--- Data for Name: processamentos; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY processamentos (id, inicio, fim, tempo_gasto_segundos, alfa_nome, alfa_arquivo, alfa_tamanho, tipo_sequencia, mostrar_maior_menor, mostrar_entre_mil_dois_mil, posicao, distancia, processamento, nome, informacao) FROM stdin;
-\.
-
-
---
--- TOC entry 2119 (class 0 OID 0)
--- Dependencies: 173
--- Name: processamentos_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('processamentos_id_seq', 1, false);
-
-
---
--- TOC entry 2095 (class 0 OID 16426)
--- Dependencies: 179
--- Data for Name: resultados; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY resultados (id, processamento_id, ocorrencia_id) FROM stdin;
-\.
-
-
---
--- TOC entry 2120 (class 0 OID 0)
--- Dependencies: 178
--- Name: resultados_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('resultados_id_seq', 1, false);
-
-
---
--- TOC entry 1963 (class 2606 OID 16407)
--- Name: betas_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY betas
-    ADD CONSTRAINT betas_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 1971 (class 2606 OID 16456)
--- Name: maiores_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY maiores
-    ADD CONSTRAINT maiores_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 1973 (class 2606 OID 16474)
--- Name: menores_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY menores
-    ADD CONSTRAINT menores_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 1965 (class 2606 OID 16486)
--- Name: ocorrencias_beta_id_j_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY ocorrencias
-    ADD CONSTRAINT ocorrencias_beta_id_j_key UNIQUE (beta_id, j);
-
-
---
--- TOC entry 1967 (class 2606 OID 16418)
--- Name: ocorrencias_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY ocorrencias
-    ADD CONSTRAINT ocorrencias_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 1961 (class 2606 OID 16443)
--- Name: processamentos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY processamentos
-    ADD CONSTRAINT processamentos_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 1969 (class 2606 OID 16431)
--- Name: resultados_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
---
-
-ALTER TABLE ONLY resultados
-    ADD CONSTRAINT resultados_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 1977 (class 2606 OID 16462)
--- Name: maiores_resultado_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY maiores
-    ADD CONSTRAINT maiores_resultado_id_fkey FOREIGN KEY (resultado_id) REFERENCES resultados(id);
-
-
---
--- TOC entry 1978 (class 2606 OID 16480)
--- Name: menores_resultado_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY menores
-    ADD CONSTRAINT menores_resultado_id_fkey FOREIGN KEY (resultado_id) REFERENCES resultados(id);
-
-
---
--- TOC entry 1974 (class 2606 OID 16419)
--- Name: ocorrencias_beta_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY ocorrencias
-    ADD CONSTRAINT ocorrencias_beta_id_fkey FOREIGN KEY (beta_id) REFERENCES betas(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-
---
--- TOC entry 1975 (class 2606 OID 16432)
--- Name: resultados_ocorrencia_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY resultados
-    ADD CONSTRAINT resultados_ocorrencia_id_fkey FOREIGN KEY (ocorrencia_id) REFERENCES ocorrencias(id);
-
-
---
--- TOC entry 1976 (class 2606 OID 16444)
--- Name: resultados_processamento_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY resultados
-    ADD CONSTRAINT resultados_processamento_id_fkey FOREIGN KEY (processamento_id) REFERENCES processamentos(id);
-
-
---
--- TOC entry 2106 (class 0 OID 0)
--- Dependencies: 5
--- Name: public; Type: ACL; Schema: -; Owner: postgres
---
-
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-REVOKE ALL ON SCHEMA public FROM postgres;
-GRANT ALL ON SCHEMA public TO postgres;
-GRANT ALL ON SCHEMA public TO PUBLIC;
-
-
--- Completed on 2016-11-06 20:59:04 AMST
-
---
--- PostgreSQL database dump complete
---
 
 CREATE TABLE public.programas
 (
-  id integer NOT NULL DEFAULT nextval('programas_id_seq'::regclass),
+  id serial NOT NULL DEFAULT,
   nome character varying(250),
   local text,
   tipo_sequencia character varying(20),
@@ -589,49 +91,72 @@ CREATE TABLE public.programas
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.programas
-  OWNER TO postgres;
 
-CREATE TABLE public.configuracoes
+CREATE TABLE public.resultados
 (
-  key character varying(40) NOT NULL,
-  valor character varying,
-  CONSTRAINT configuracoes_pkey PRIMARY KEY (key)
+  id serial NOT NULL DEFAULT, 
+  processamento_id integer,
+  ocorrencia_id integer,
+  distancia integer,
+  CONSTRAINT resultados_pkey PRIMARY KEY (id),
+  CONSTRAINT resultados_ocorrencia_id_fkey FOREIGN KEY (ocorrencia_id)
+      REFERENCES public.ocorrencias (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT resultados_processamento_id_fkey FOREIGN KEY (processamento_id)
+      REFERENCES public.processamentos (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE public.configuracoes
-  OWNER TO postgres;
+
+
+CREATE TABLE public.maiores
+(
+  id serial NOT NULL DEFAULT,
+  resultado_id integer,
+  CONSTRAINT maiores_pkey PRIMARY KEY (id),
+  CONSTRAINT maiores_resultado_id_fkey FOREIGN KEY (resultado_id)
+      REFERENCES public.resultados (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+
+
+CREATE TABLE public.menores
+(
+  id serial NOT NULL DEFAULT,
+  resultado_id integer,
+  CONSTRAINT menores_pkey PRIMARY KEY (id),
+  CONSTRAINT menores_resultado_id_fkey FOREIGN KEY (resultado_id)
+      REFERENCES public.resultados (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
 
 
 
-#DADOS
+
+CREATE OR REPLACE VIEW public.view_processamentos AS 
+ SELECT p.id,
+    p.alfa_nome,
+    p.alfa_tamanho,
+    p.nome,
+    p.informacao,
+    p.quantidade_diferencas,
+    p.tipo_sequencia,
+    count(rs.id) AS ocorrencias
+   FROM processamentos p
+     JOIN resultados rs ON rs.processamento_id = p.id
+  WHERE p.salvo = true
+  GROUP BY p.id, p.alfa_nome, p.alfa_tamanho, p.nome, p.informacao, p.quantidade_diferencas, p.tipo_sequencia;
 
 
-COPY programas (id, nome, local, tipo_sequencia, versao, ativo, parametros) FROM stdin;
-1	kdifferenceprime1	C:/Users/jeandobre/Documents/Mestrado/Bioinformática/k-difference-prime/kdifferenceprime1.exe	DIFERENTES	2.0	t	-vs1
-2	kdifferenceprime2	C:/Users/jeandobre/Documents/Mestrado/Bioinformática/k-difference-prime/kdifferenceprime2.exe	PARECIDAS	2.0	t	-vs1
-3	kdifferenceprime1	/home/jeandobre/k-difference-prime/kdifferenceprime1	DIFERENTES	2.0	t	-vs1
-4	kdifferenceprime2	/home/jeandobre/k-difference-prime/kdifferenceprime2	PARECIDAS	2.0	t	-vs1
-\.
 
 
---
--- Name: programas_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('programas_id_seq', 4, true);
 
 
-COPY configuracoes (key, valor) FROM stdin;
-diretorio.entrada.linux	/home/jeandobre/k-difference-prime/dados
-diretorio.entrada.windows	C:/Users/jeandobre/Documents/Mestrado/Bioinformática/k-difference-prime/dados
-sequencia.diferente.windows	1
-sequencia.parecida.windows	2
-sequencia.parecida.linux	4
-sequencia.diferente.linux	3
-sequencia.heuristica.windows	\N
-sequencia.heuristica.linux	\N
-diretorio.saida.windows	C:/Users/jeandobre/Documents/Mestrado/Bioinformática/k-difference-prime/saida
-diretorio.saida.linux	/home/jeandobre/k-difference-prime/saida

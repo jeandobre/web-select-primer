@@ -26,10 +26,19 @@ public class Configuracao extends GenericModel {
     public static String getValor(String chave){
         String so = Play.configuration.getProperty("so");
         chave += "." + so;
-       return ((Configuracao) find("key = :chave").setParameter("chave", chave).first()).valor;
+                
+        return ((Configuracao) find("key = :chave").setParameter("chave", chave).first()).valor;
     }
 
     public static List<Configuracao> getLista(){
         return find("order by key").fetch();
+    }
+    
+    public static void setValor(String chave, String valor){
+    	String so = Play.configuration.getProperty("so");
+        chave += "." + so;
+        Configuracao conf = ((Configuracao) find("key = :chave").setParameter("chave", chave).first());
+        conf.valor = valor;
+        conf.save();        
     }
 }

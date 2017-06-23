@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 
 import play.data.validation.Valid;
 import play.cache.Cache;
@@ -28,15 +29,6 @@ public class Application extends Controller {
     public static void erro(){
         validation.keep();
         render();
-    }
-
-    /****
-     *
-     * @param id
-     */
-    public static void computar(){
-        ProcessamentoBean.computarResultado();
-       // ProcessamentoBean.computarResultado2();
     }
 
 
@@ -64,38 +56,45 @@ public class Application extends Controller {
 
     public static void process(@Valid Parametros parametro){
         final String localEntrada = Configuracao.getValor("diretorio.entrada");
-        Arquivo alfa;
+        Arquivo alfa = null;
         List<Arquivo> betas = new ArrayList<Arquivo>();
-
+                
+        //parametro.tipoSequencia = TipoSequencia.DIFERENTES;
+        
         System.out.println(parametro.toString());
-
+              
         if(validation.hasErrors()) {
             validation.keep();
             erro();
         } else {
-            if(parametro.tipoSequenciaAlfa == 1) validation.required("parametro.alfa", parametro.textoAlfa);
+            if(parametro.alfa == null) validation.required("parametro.alfa", parametro.textoAlfa);
             else validation.required("parametro.alfa", parametro.alfa);
-            if(parametro.tipoSequenciaBeta == 1) validation.required("parametro.beta", parametro.textoBeta);
-            else if (parametro.beta == null || parametro.beta.length == 0)
+            
+            if(parametro.beta == null || parametro.beta.length == 0) 
+            	validation.required("parametro.beta", parametro.textoBeta);
+            else if (parametro.textoBeta == null)
                 validation.addError("Erro", "É necessário adicionar uma ou mais sequências para o processamento!");
 
-            if(!parametro.tipoProcessamento){
-                validation.required("parametro.jInicio", parametro.jInicio);
-                validation.required("parametro.jFim", parametro.jFim);
-            }
-
+            
             if(parametro.mostrarDistancia){
-                validation.required("parametro.distancia",parametro.distancia);
+            	validation.required("parametro.distancia", parametro.distancia);
             }
+            
             if(parametro.mostrarLimiteCaracteres){
-                validation.required("parametro.limiteCaracteres",parametro.limiteCaracteres);
+            	validation.required("parametro.mostrarLimiteCaracteres", parametro.mostrarLimiteCaracteres);
             }
-
+         
             if(validation.hasErrors()) {
                 validation.keep();
                 erro();
             } else {
-                if (parametro.tipoSequenciaAlfa == 1) {
+            	Integer tipoSequenciaAlfa = 0;
+            	Integer tipoSequenciaBeta = 0;
+            	            	          	
+            	if(!StringUtils.isBlank(parametro.textoAlfa)) tipoSequenciaAlfa = 1;
+            	if(!StringUtils.isBlank(parametro.textoBeta)) tipoSequenciaBeta = 1;
+            	
+                if (tipoSequenciaAlfa == 1) {
                     //entao é texto, gera o arquivo
                     alfa = ProcessamentoBean.uploadText(ConvertFASTA2txt.converter(parametro.textoAlfa));
                 } else {
@@ -103,9 +102,10 @@ public class Application extends Controller {
                     alfa = ValidCharDNA.validar(localEntrada + "/" + parametro.alfa.getName());
                     alfa.nome = parametro.alfa.getName();
                     alfa.fasta = fasta;
+                    alfa.quantidadeCaracteres = alfa.sequencia.length();
                 }
 
-                if (parametro.tipoSequenciaBeta == 1) {
+                if (tipoSequenciaBeta == 1) {
                     //então é texto, gera o arquivo
                     Arquivo beta = ProcessamentoBean.uploadText(ConvertFASTA2txt.converter(parametro.textoBeta));
                     betas.add(beta);
@@ -124,61 +124,65 @@ public class Application extends Controller {
                         bt = null;
                     }
                 }
+                
+                //System.out.println(alfa.toString());
+                
 
                 if (alfa.quantidadeCaracteres < parametro.k) {
-                    validation.addError("Erro", "A quantidade de diferenças (k) não pode ser maior que a quantidade de caracteres da sequência alvo");
+                    validation.addError("Erro", "A quantidade de diferenças (k) não pode ser maior que a quantidade de caracteres da sequência alvo!");
+                }
+                
+                if(parametro.jInicio == null) parametro.jInicio = 1;
+                if(parametro.jFim == null) parametro.jFim = alfa.sequencia.length();
+
+
+                if (parametro.jInicio < 1) { //se o j for menor que 1 está errado
+                   validation.addError("Erro", "A posição de início não pode ser menor que 1, que é a posição inicial da sequência alvo!");
                 }
 
-                if (!parametro.tipoProcessamento) {
-                    if (parametro.jInicio < 1) { //se o j for igual a distancia esta errado
-                        validation.addError("Erro", "A posição de início não pode ser menor que 1, que é a posição inicial da sequência alvo!");
-                    }
-
-                    if (parametro.jInicio == parametro.jFim) { //se o j for igual a distancia esta errado
-                        validation.addError("Erro", "A posição de início não pode ser igual à posição de fim da sequência alvo!");
-                    }
-                    if (parametro.jInicio > (alfa.quantidadeCaracteres - 1)) {
-                        validation.addError("Erro", "A posição de início deve estar no intervalo entre 1 e "
+                if (parametro.jInicio == parametro.jFim) { //se o j for igual o fim esta errado
+                   validation.addError("Erro", "A posição de início não pode ser igual à posição de fim da sequência alvo!");
+                }
+                if (parametro.jInicio > (alfa.quantidadeCaracteres - 1)) {
+                   validation.addError("Erro", "A posição de início deve estar no intervalo entre 1 e "
                                 + (alfa.quantidadeCaracteres - 1) + "!");
-                    }
-                    if (parametro.jFim > alfa.quantidadeCaracteres) {
-                        validation.addError("Erro", "A posição de fim deve estar no intervalo entre 2 e "
+                }
+                if (parametro.jFim > alfa.quantidadeCaracteres) {
+                   validation.addError("Erro", "A posição de fim deve estar no intervalo entre 2 e "
                                 + alfa.quantidadeCaracteres + ", que é o tamanho da sequência alvo!");
-                    }
                 }
-
-                if (parametro.mostrarDistancia) {
-                    if (parametro.distancia < 1) {
-                        validation.addError("Erro", "A distancia entre as ocorrências deve ser maior que 0!");
-                    }
-                    if (parametro.distancia >= alfa.quantidadeCaracteres) {
-                        validation.addError("Erro", "A distancia entre as ocorrências não " +
-                                "pode ser maior ou igual ao tamanho da sequência alvo!");
-                    }
-                }
-
-                if (parametro.mostrarLimiteCaracteres) {
-                    if (parametro.limiteCaracteres < 1) {
-                        validation.addError("Erro", "O limite de caracteres na ocorrência deve ser maior que 0!");
-                    }
-                    if (parametro.limiteCaracteres >= alfa.quantidadeCaracteres) {
-                        validation.addError("Erro", "O limite de caracteres na ocorrência não " +
-                                "pode ser maior ou igual ao tamanho da sequência alvo!");
-                    }
-                }
-
-                if (validation.hasErrors()) {
-                    validation.keep();
-                    erro();
-                } else {
-
-                    Long id = ProcessamentoBean.processamento(parametro, alfa, betas);
-                    result(id);
-                }
+             }
+            
+            if(parametro.mostrarDistancia){
+            	if(parametro.distancia < 1){
+            		validation.addError("Erro", "A distância entre as ocorrências deve ser maior que 0!");
+            	}
+            	if(parametro.distancia > alfa.quantidadeCaracteres){
+            		validation.addError("Erro", "A distância entre as ocorrências não deve ser menor ou igual ao tamanho da sequência alvo!");
+            	}
             }
-        }
-    }
+            
+            if(parametro.mostrarLimiteCaracteres){
+            	if(parametro.limiteCaracteres < 1){
+            		validation.addError("Erro", "O limite de caracteres na ocorrência deve ser maior que 0!");
+            	}
+            	if(parametro.limiteCaracteres >= alfa.quantidadeCaracteres){
+            		validation.addError("Erro", "O limite de caracteres na ocorrência deve ser menor ou igual ao tamanho da sequência alvo!");
+            	}
+            }
 
+         
+            if (validation.hasErrors()) {
+                validation.keep();
+                erro();
+            } else {
+            	
+            	Long id = ProcessamentoBean.processamento(parametro, alfa, betas);
+                result(id);
+            }
+        }        
+    }
+    
     public static void posicao(Long processamentoId, Integer j){
         System.out.println(processamentoId + ", " + j);
         Resultado resultado = Resultado.getResultadoPorProcessamento(processamentoId, j);
@@ -210,6 +214,10 @@ public class Application extends Controller {
 
         List<ViewProcessamento> processamentos = ViewProcessamento.listaProcessamentosSalvos(busca, pagina);
         int total = Processamento.paginasProcessamentos(busca);
+        //System.out.println("===================================");
+        //System.out.println(busca);
+        //System.out.println(pagina);
+        //System.out.println(processamentos.size());
         render(processamentos, pagina, total);
     }
 
@@ -247,6 +255,10 @@ public class Application extends Controller {
     public static void listaResultado(Long processamentoId, Integer pagina){
         int total = Resultado.paginasResultadosPorProcessamento(processamentoId);
         List<Resultado> resultados = Resultado.todosResultadosPorProcessamentoOrdem(processamentoId, pagina);
+//        System.out.println("===================================");
+//        System.out.println(pagina);
+//        System.out.println(resultados.size());
+        
         render(resultados, pagina, total);
     }
 
@@ -315,5 +327,22 @@ public class Application extends Controller {
             validation.keep();
             erro();
         }
+    }
+    
+    public static void config(){    	
+    	List<Programa> programas = Programa.getLista();	
+    	String entrada = Configuracao.getValor("diretorio.entrada");
+    	String saida   = Configuracao.getValor("diretorio.saida");
+    	render(entrada, saida, programas);
+    }
+    
+    public static void configSalvar(String entrada, String saida){
+    	Configuracao.setValor("diretorio.entrada", entrada);
+    	Configuracao.setValor("diretorio.saida", saida);
+    	config();
+    }
+    
+    public static void computarLCE(){
+    	//  ProcessamentoBean.computarLCE();  
     }
 }

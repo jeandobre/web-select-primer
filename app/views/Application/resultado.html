@@ -33,39 +33,50 @@
 <script>
    $( document ).ready(function(){
 
-      $(".head").css("height", "195px");
+      $(".head").css("height", "120px");
 
       $("#voltar").click(function(){
          $('.div-ajax-carregamento-pagina').show();
       });
 
       function carregar(pagina){
+    	  $('#table tr:last').data("liberado", 0);   
           $.getJSON( "/resultado-json/${processamento.id}/" + pagina, function( data ) {
-               var restante = data.restante;
-               for (var i = 0; i < data.lista.length; i++) {
-                   var texto = '<tr><td style="text-align: center; width: 50px">' + data.lista[i].posicao + '</td>';
-                       texto +='<td style="width: 60px">' + data.lista[i].j + '</td>';
-                       texto +='<td style="width: 60px">' + data.lista[i].r + '</td>';
-                       texto += '<td style="font-size: 10px" class="' + data.lista[i].classe + '">';
-                       texto += '<span class="segmento">' + data.lista[i].segmento + '</span>';
-                       texto += '</td><td>';
-                       texto += '<a href="/processamento/resultado/' + data.lista[i].id + '/txt" class="salvar"';
-                       texto += 'title="Clique aqui para salvar este segmento em arquivo.">';
-                       texto += '<span class="glyphicon glyphicon-save-file"></span></a>';
-                       texto +='</td></tr>';
-                    $('#table').find('tbody').append(texto);
-                }
-                console.log(restante);
-                $('.body').unbind('scroll');
-                if(restante > 0){
-                    $('.body').scroll(function(){
-
-                      if($('#table').height() - $('.body').scrollTop() == 574)
-                        carregar(pagina + 1);
-                    });
-                }
-          });
+             var restante = data.restante;
+             for (var i = 0; i < data.lista.length; i++) {
+                 var texto = '<tr><td style="text-align: center; width: 50px">' + data.lista[i].posicao + '</td>';
+                     texto +='<td style="width: 60px">' + data.lista[i].j + '</td>';
+                     texto +='<td style="width: 60px">' + data.lista[i].r + '</td>';
+                     texto += '<td style="font-size: 10px" class="' + data.lista[i].classe + '">';
+                     texto += '<span class="segmento">' + data.lista[i].segmento + '</span>';
+                     texto += '</td><td>';
+                     texto += '<a href="/processamento/resultado/' + data.lista[i].id + '/txt" class="salvar"';
+                     texto += 'title="Clique aqui para salvar este segmento em arquivo.">';
+                     texto += '<span class="glyphicon glyphicon-save-file"></span></a>';
+                     texto +='</td></tr>';
+                  $('#table').find('tbody').append(texto);
+              }  
+              $('#table tr:last').data("restante", restante);      
+              $('#table tr:last').data("pagina", pagina+1);                             
+              $('#table tr:last').data("liberado", 1);        
+          });                    
       }
+
+      $('.body').scroll(function(){
+          var obj = $('#table tr:last');
+          var restante = obj.data("restante");
+          var altura =   obj.offset().top;
+          var pagina =   obj.data("pagina");
+
+          var tela = $('.body').height() + $('.body').offset().top;
+
+          var liberado = obj.data("liberado");
+          
+          if(liberado === 1 && restante > 0 && altura < tela){
+             carregar(pagina);
+          }    
+       });
+      
       carregar(1);
    });
 </script>

@@ -12,5 +12,14 @@ public class Arquivo {
     public Boolean fasta;
     public String sequencia;
     public String local;
+	
+    
+    @Override
+	public String toString() {
+		return "Arquivo [nome=" + nome + ", quantidadeCaracteres=" + quantidadeCaracteres + ", fasta=" + fasta
+				+ ", sequencia=" + sequencia + ", local=" + local + "]";
+	}
+    
+    
 
 }

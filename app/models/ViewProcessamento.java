@@ -48,10 +48,10 @@ public class ViewProcessamento extends GenericModel {
 
     public static List<ViewProcessamento> listaProcessamentosSalvos(String busca, Integer pagina){
         final Integer linhas = Integer.valueOf(Play.configuration.getProperty("linhas-por-pagina"));
-
+        //System.out.println(busca);
         return ViewProcessamento.find("(alfaNome like :busca " +
-                " OR nome like :busca OR informacao like :busca) " +
-                " ORDER BY id DESC")
+              " OR nome like :busca OR informacao like :busca) " +
+              " ORDER BY id DESC")
                 .setParameter("busca","%" + busca + "%")
                 .fetch(pagina, linhas);
     }

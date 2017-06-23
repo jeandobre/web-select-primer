@@ -49,8 +49,8 @@ public class Processamento extends GenericModel {
     @JoinColumn(name = "programa_id")
     public Programa programa;
 
-    @Column(name="mostrar_maior_menor")
-    public Boolean mostrarMaiorMenor;
+   /* @Column(name="mostrar_maior_menor")
+    public Boolean mostrarMaiorMenor; */
 
    /* @Column(name="mostrar_entre_mil_dois_mil")
     public Boolean mostrarEntreMilDoisMil; */
@@ -62,16 +62,16 @@ public class Processamento extends GenericModel {
     public Integer jFim;
 
     @Column(name = "mostrar_distancia")
-    public Boolean mostrarDistancia;
+    public Boolean mostrarDistancia; 
 
     @Column
-    public Integer distancia;
+    public Integer distancia; 
 
     @Column(name="mostrar_limite_caracteres")
-    public Boolean mostrarLimiteCaracteres;
+    public Boolean mostrarLimiteCaracteres; 
 
     @Column(name = "limite_caracteres")
-    public Integer limiteCaracteres;
+    public Integer limiteCaracteres; 
 
     @Column
     public String processamento;

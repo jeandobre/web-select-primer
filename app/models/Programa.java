@@ -2,6 +2,8 @@ package models;
 
 import play.db.jpa.GenericModel;
 
+import java.util.List;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
@@ -38,5 +40,9 @@ public class Programa extends GenericModel {
 
     @Column
     public Boolean ativo;
+    
+    public static List<Programa> getLista(){
+        return find("order by id").fetch();
+    }
 
 }

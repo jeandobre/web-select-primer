@@ -17,6 +17,7 @@ import java.util.*;
 
 /**
  * Created by jeandobre on 05/11/2016.
+ * Updated by jeandobre on 19/06/2017
  */
 public class ProcessamentoBean {
 
@@ -25,7 +26,6 @@ public class ProcessamentoBean {
 
     public static final String sequenciaParecida =  Configuracao.getValor("sequencia.parecida");
     public static final String sequenciaDiferente = Configuracao.getValor("sequencia.diferente");
-    public static final String heuristica =         Configuracao.getValor("sequencia.heuristica");
 
     public static final String localSaida =         Configuracao.getValor("diretorio.saida");
 
@@ -34,7 +34,7 @@ public class ProcessamentoBean {
         Calendar calendar = Calendar.getInstance();
         if(parametro.tipoSequencia == TipoSequencia.PARECIDAS) getId = sequenciaParecida;
         else if(parametro.tipoSequencia == TipoSequencia.DIFERENTES) getId = sequenciaDiferente;
-        else getId = heuristica;
+        
 
         Programa programa = Programa.findById(Long.valueOf( getId ) );
         TipoSequencia tipoSequencia = programa.tipoSequencia;
@@ -44,18 +44,17 @@ public class ProcessamentoBean {
         commandLine += " -k " + parametro.k;
         Integer i = 0;
 
-        if (!parametro.tipoProcessamento) {
-            commandLine += " -j " + parametro.jInicio + " " + (parametro.jFim - parametro.jInicio);
-            i = parametro.jInicio;
-        }
-
+        
+        commandLine += " -j " + (parametro.jInicio - 1) + " " + (parametro.jFim - parametro.jInicio - 1);
+        i = parametro.jInicio;
+        
         Processamento processamento = new Processamento();
         processamento.inicio = calendar.getTime();
         processamento.alfaNome = alfa.nome;
         processamento.alfaArquivo = alfa.local;
         processamento.alfaTamanho = alfa.quantidadeCaracteres;
         processamento.tipoSequencia = tipoSequencia;
-        processamento.mostrarMaiorMenor = parametro.maiorMenor;
+        //processamento.mostrarMaiorMenor = parametro.maiorMenor;
         processamento.mostrarDistancia = parametro.mostrarDistancia;
         processamento.mostrarLimiteCaracteres = parametro.mostrarLimiteCaracteres;
         processamento.jInicio = parametro.jInicio;
@@ -90,12 +89,11 @@ public class ProcessamentoBean {
         //recupera os resultados por beta;
         for(ArquivoBeta beta : processamento.betas){
             beta.ocorrencias = new ArrayList<Ocorrencia>();
-            List<CandidatoPrimer> candidatos = CandidatoPrimer.computaResultado(beta.arquivoResultado);
+            List<CandidatoPrimer> candidatos = CandidatoPrimer.computaResultado(beta.arquivoResultado, alfa.sequencia);
             for (CandidatoPrimer cp : candidatos) {
                 Ocorrencia ocr = new Ocorrencia();
                 ocr.beta = beta;
-                if(parametro.tipoProcessamento) ocr.j = cp.j + 1; //para não iniciar em zero
-                else ocr.j = cp.j;
+                ocr.j = cp.j;
                 ocr.r = cp.tamanho;
                 ocr.segmento = cp.sequencia;
                 ocr.letra = String.valueOf(cp.sequencia.charAt(0));
@@ -167,20 +165,20 @@ public class ProcessamentoBean {
         }
 
         //depois encontramos todos os resultados maiores e menores;
-        if(processamento.mostrarMaiorMenor) {
-            for (Resultado re : processamento.resultados) {
-                if (re.ocorrencia.r == processamento.maiorTamanho) {
-                    Maior big = new Maior();
-                    big.resultado = re;
-                    re.maior = big;
-                }
-                if (re.ocorrencia.r == processamento.menorTamanho) {
-                    Menor small = new Menor();
-                    small.resultado = re;
-                    re.menor = small;
-                }
+    
+        for (Resultado re : processamento.resultados) {
+            if (re.ocorrencia.r == processamento.maiorTamanho) {
+                Maior big = new Maior();
+                big.resultado = re;
+                re.maior = big;
+            }
+            if (re.ocorrencia.r == processamento.menorTamanho) {
+                Menor small = new Menor();
+                small.resultado = re;
+                re.menor = small;
             }
         }
+        
 
         calendar = Calendar.getInstance();
         processamento.fim = calendar.getTime();
@@ -225,7 +223,7 @@ public class ProcessamentoBean {
 
     public static Arquivo uploadText(String sequencia){
         final String localEntrada = Configuracao.getValor("diretorio.entrada");
-
+                
         Arquivo arquivo = new Arquivo();
         arquivo.nome = randomIdentifier();
         arquivo.local = localEntrada + "/" + arquivo.nome;
@@ -242,152 +240,148 @@ public class ProcessamentoBean {
         }
         return arquivo;
     }
-
-
-    public static void computarResultado(){
-
-        //String local = "C:/Users/jeandobre/Documents/Mestrado/Bioinformática/dadosQualificados/";
-        String local = "C:/Users/jeandobre/Documents/Mestrado/Bioinformática/ResultadoServidor/";
-        List<Integer> tamanhos = new ArrayList<Integer>();
-      /*  tamanhos.add(1000);
-        tamanhos.add(2000);
-        tamanhos.add(3000);
-        tamanhos.add(4000);
-        tamanhos.add(5000);
-        tamanhos.add(6000);
-        tamanhos.add(7000);
-        tamanhos.add(8000);
-        tamanhos.add(9000);
-        tamanhos.add(10000);
-        tamanhos.add(20000);
-        tamanhos.add(30000);
-        tamanhos.add(40000);
-        tamanhos.add(50000);
-        tamanhos.add(60000);
-        tamanhos.add(70000);
-        tamanhos.add(80000);
-        tamanhos.add(90000);
-        tamanhos.add(100000); */
-
-       // tamanhos.add(4398);
-        tamanhos.add(4455);
-        tamanhos.add(5457);
-        tamanhos.add(8694);
-        tamanhos.add(14972);
-        tamanhos.add(16877);
-        tamanhos.add(38530);
-        tamanhos.add(51655);
-        tamanhos.add(66302);
-      //  tamanhos.add(90284);
-
-        Integer k = 30;
-        List<Integer> lista;
-
-        String file = "";
-        //for(Integer i : tamanhos) {
-         Integer i = 16877;
-            for (Integer j : tamanhos) {
-
-                file = "a" + i + "_b" + j + "_k" + k + "_K1v1";
-                try {
-                    Computacao cmp = new Computacao();
-                    cmp.k = k;
-                    cmp.alfa = i;
-                    cmp.beta = j;
-
-                    BufferedReader br = new BufferedReader(new FileReader(local + file));
-                    lista = new ArrayList<Integer>();
-                    int count = 0;
-                    while (br.ready()) {
-                        String linha = br.readLine();
-                        if (count == 0) {
-                            count++;
-                            continue;
-                        }
-
-                        //System.out.println(linha);
-                        String gg[] = linha.split(";");
-                        //System.out.println(gg[0] + " - " + gg[1]);
-                        lista.add(Integer.valueOf(gg[1]));
-                    }
-                    br.close();
-
-                    //encontrar o maior e menor e média
-                    int maior = -1, menor = 10000000;
-                    float soma = 0;
-                    for (Integer ii : lista) {
-                        if (ii.intValue() > maior) maior = ii;
-                        if (ii.intValue() < menor) menor = ii;
-                        soma += ii;
-                    }
-                    cmp.maior = maior;
-                    cmp.menor = menor;
-                    cmp.media = soma / lista.size();
-                    cmp.ocr = lista.size();
-                    cmp.ruim = ((cmp.maior.intValue() == cmp.menor.intValue()) && (cmp.menor.intValue() == cmp.media));
-                    cmp.save();
-
-                    // return True;
-                } catch (IOException ioe) {
-                    ioe.printStackTrace();
-                }
+    
+   // public static String carregarSequencia(String file){
+    	/*String seq = "";
+    	try{
+    		file = "/home/jean/k-difference-prime/dados/" + file; 
+            BufferedReader br = new BufferedReader(new FileReader(file));
+           
+            while(br.ready()){
+                seq = br.readLine();                
             }
-        //}
-    }
-
-    public static void computarResultado2(){
-
-        //String local = "C:/Users/jeandobre/Documents/Mestrado/Bioinformática/dadosQualificados/";
-        String local = "C:/Users/jeandobre/Documents/Mestrado/Bioinformática/ResultadoServidor/";
-
-        Integer k = 30;
-        List<Computacao> tamanhos = Computacao.todosRuim(30);
-        List<Integer> lista;
-
-        String file = "";
-        for(Computacao  cmp : tamanhos) {
-            Integer i = cmp.alfa;
-            Integer j = cmp.beta;
-            file = "a" + i + "_b" + j + "_k" + k + "_K1v1";
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(local + file));
-                lista = new ArrayList<Integer>();
-                int count = 0;
-                while (br.ready()) {
-                    String linha = br.readLine();
-                    if (count == 0) {
-                        count++;
-                        continue;
-                    }
-
-                    //System.out.println(linha);
-                    String gg[] = linha.split(";");
-                    //System.out.println(gg[0] + " - " + gg[1]);
-                    lista.add(Integer.valueOf(gg[1]) - Integer.valueOf(gg[0]));
-                }
-                br.close();
-
-                //encontrar o maior e menor e média
-                int maior = -1, menor = 10000000;
-                float soma = 0;
-                for (Integer ii : lista) {
-                    if (ii.intValue() > maior) maior = ii;
-                    if (ii.intValue() < menor) menor = ii;
-                    soma += ii;
-                }
-                cmp.maior = maior;
-                cmp.menor = menor;
-                cmp.media = soma / lista.size();
-                cmp.ocr = lista.size();
-                cmp.ruim = ((cmp.maior.intValue() == cmp.menor.intValue()) && (cmp.menor.intValue() == cmp.media));
-                cmp.save();
-
-                // return True;
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-
+            br.close();
+            // return True;
+        }catch(IOException ioe) {
+            ioe.printStackTrace();
         }
+    	return seq;
+    }
+    
+    public static void computarLCE(){
+    	//int tam[] = {1000, 2000, 3000,4000,5000,6000,7000,8000,9000,
+    	//		10000,20000,30000,40000,50000,60000, 70000, 80000, 90000, 100000};
+    	
+    //	int files[] = {1000, 2000, 3000,4000,5000,6000,7000,8000,9000,
+    	//    			10000,20000,30000,40000,50000,60000, 70000, 80000, 90000, 100000};
+    	int files[] = {100000};
+    	
+    	//String files[] = {"hsarhgdig","hsascl2","hsankrd43","hsa1bg","hsalg10b",
+    	//		"hsbad","hsankr10","hsasz1","hsaff4"};
+    /*	
+    	String files[][] = {{"hoxa4hs","hoxa4mm"},{"hoxa4hs","hoxa4pt"},{"hoxa4hs","hoxa4ph"},
+    			            {"hoxa4hs","hoxa4pa"},{"hoxa4hs","hoxa4cf"},{"hoxa4mm","hoxa4hs"},
+    			            {"hoxa4mm","hoxa4pt"},{"hoxa4mm","hoxa4ph"},{"hoxa4mm","hoxa4pa"},
+    			            {"hoxa4mm","hoxa4cf"},{"hoxa4pt","hoxa4mm"},{"hoxa4pt","hoxa4cf"},
+    			            {"hoxa4pt","hoxa4pa"},{"hoxa4pt","hoxa4hs"},{"hoxa4pt","hoxa4ph"},
+    			            {"hoxa4ph","hoxa4pa"},{"hoxa4ph","hoxa4cf"},{"hoxa4ph","hoxa4mm"},
+    			            {"hoxa4ph","hoxa4hs"},{"hoxa4ph","hoxa4pt"},{"hoxa4pa","hoxa4mm"},
+    			            {"hoxa4pa","hoxa4hs"},{"hoxa4pa","hoxa4cf"},{"hoxa4pa","hoxa4pt"},
+    			            {"hoxa4pa","hoxa4ph"},{"hoxa4cf","hoxa4mm"},{"hoxa4cf","hoxa4hs"},
+    			            {"hoxa4cf","hoxa4pa"},{"hoxa4cf","hoxa4pt"},{"hoxa4cf","hoxa4ph"},
+    			            {"ctsdhs","ctsdpt"},{"ctsdpt","ctsdhs"},{"ddx18hs","ddx18pt"},
+    			            {"ddx18pt","ddx18hs"},{"lrrc4hs","lrrc4mf"},{"lrrc4hs","lrrc4mm"},
+    			            {"lrrc4hs","lrrc4bbb"},{"lrrc4hs","lrrc4pa"},{"lrrc4mf","lrrc4hs"},
+    			            {"lrrc4mf","lrrc4mm"},{"lrrc4mf","lrrc4bbb"},{"lrrc4mf","lrrc4pa"},
+    			            {"lrrc4mm","lrrc4hs"},{"lrrc4mm","lrrc4mf"},{"lrrc4mm","lrrc4bbb"},
+    			            {"lrrc4mm","lrrc4pa"},{"lrrc4bbb","lrrc4hs"},{"lrrc4bbb","lrrc4mm"},
+    			            {"lrrc4bbb","lrrc4mf"},{"lrrc4bbb","lrrc4pa"},{"lrrc4pa","lrrc4hs"},
+    			            {"lrrc4pa","lrrc4mm"},{"lrrc4pa","lrrc4mf"},{"lrrc4pa","lrrc4bbb"},
+    			            {"kcnk4hs1","kcnk4ggg"},{"kcnk4hs1","kcnk4pt"},{"kcnk4hs1","kcnk4pa"},
+    			            {"kcnk4ggg","kcnk4hs1"},{"kcnk4ggg","kcnk4pt"},{"kcnk4ggg","kcnk4pa"},
+    			            {"kcnk4pt","kcnk4hs1"},{"kcnk4pt","kcnk4ggg"},{"kcnk4pt","kcnk4pa"},
+    			            {"kcnk4pa","kcnk4hs1"},{"kcnk4pa","kcnk4ggg"},{"kcnk4pa","kcnk4pt"},
+    			            {"dnajc4hs","dnajc4mm"},{"dnajc4mm","dnajc4hs"},{"dppa5hs","dppa5mm"},
+    			            {"dppa5mm","dppa5hs"}}; 
+    	
+    	//String files[] = {"hsankr10","hsasz1","hsaff4"};
+    	
+    	for(int w = 0; w < files.length; w++){
+    		//for(int v = 0; v < files.length; v++){
+    			
+    			//if(w == v) continue;
+    			
+	    	    int tamanho = files[w];
+	    	    String file = "";
+	    	    if(tamanho < 10000) file +="0";
+	    	    file += String.valueOf(tamanho) + ".txt";
+	    	    //System.out.println(file);
+	    	    
+	    	    String alfa = carregarSequencia("alfa_" + file);
+	        	String beta = carregarSequencia("beta_" + file);
+
+	        	double max, media_s, media_c;
+	        	double soma;
+	        	long tt;
+	        	//System.out.println(alfa);
+	        	//System.out.println(beta);
+	        	int m = alfa.length();
+	        	int n = beta.length();
+	        	
+	        	soma = 0;
+	        	max = 0;
+	        	long inc = 0;
+	        	
+		    	for(int i = 0; i < m; i++){
+		    		for(int j = 0; j < n; j++){
+		    			int row = 0;
+		    			while(i+row < m && j+row < n && alfa.charAt(i+row)==beta.charAt(j+row))row++;
+
+		    			if(row > max) max = row;
+		    			if(row > 0) inc++;
+		    			soma += row;
+		    		}
+		    	}
+		    	tt = (m*n);
+		    			    	
+		    	System.out.println("Soma: " + soma + ", inc:" + inc + ", tt: " + tt);
+		    	
+		    	media_c = (soma / (tt < 0 ? tt * -1 : tt));
+		    	media_s = (soma / inc);
+		    	System.out.print(m + ";");
+		    	System.out.print(n + ";");
+		    	System.out.println(max + ";" + media_c + ";" +  media_s + ";");
+	    	//}
+    	}*/
+    //}
+    
+    public static void computarLCEunico(){
+    	
+    	/*		String alfa = "CGTGTCGTACGTGCACGTGA";
+    			String beta = "CCCGGCCCGTCCA";
+    			
+    			String alfa1 = "CCCGGCCCGTCCA";
+    			String beta1 = "CGTGTCGTACGTGCACGTGA";
+
+	        	int m = alfa.length();
+	        	int n = beta.length();
+	        		        	
+	        	System.out.println("==============================");
+		    	for(int i = 0; i < m; i++){
+		    		for(int j = 0; j < n; j++){
+		    			int row1 = 0;
+		    			while(i+row1 < m && j+row1 < n && alfa.charAt(i+row1)==beta.charAt(j+row1))row1++;
+		    			
+		    			int row2 = 0;
+		    			while(i+row2 < m && j+row2 < n && alfa1.charAt(j+row2)==beta1.charAt(i+row2))row2++;
+		    			
+		    			if(row1 != row2)
+		    			  System.out.println("LCE(" + i + "," + j + ")=" + row1 + ";" + "LCE(" + j + "," + i + ")=" + row2 + ";");	
+		    		}
+		    	}
+		    	
+		    	
+    			/*
+		    	
+		    	System.out.println("==============================");
+		    	for(int i = 0; i < m; i++){
+		    		for(int j = 0; j < n; j++){
+		    			int row = 0;
+		    			while(i+row < m && j+row < n && alfa.charAt(i+row)==beta.charAt(j+row))row++;
+		    			System.out.println("LCE(" + i + "," + j + ")=" + row + ";");	
+		    		}
+		    	}*/
+		    	
     }
 
 }

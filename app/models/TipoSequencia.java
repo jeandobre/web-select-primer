@@ -6,6 +6,5 @@ package models;
 public enum TipoSequencia {
 
     PARECIDAS,
-    DIFERENTES,
-    HEURISTICA;
+    DIFERENTES;
 }

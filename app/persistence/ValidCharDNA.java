@@ -18,11 +18,7 @@ public class ValidCharDNA {
             BufferedReader br = new BufferedReader(new FileReader(file));
             int value = 0;
             while((value = br.read()) != -1){
-                char c = (char)value;
-                /*if((c != 'A') && (c != 'C') && (c != 'G') && (c != 'T') && (c != 'U')){
-                    System.out.println(c);
-                    //TODO trhow erro
-                } */
+                char c = (char)value;            
                 novo.sequencia += c;
                 novo.quantidadeCaracteres++;
             }
@@ -31,8 +27,7 @@ public class ValidCharDNA {
         }catch(IOException ioe){
             ioe.printStackTrace();
         }
-        //TODO verificar quantidade > 0
-
+        
         return novo;
     }
 
