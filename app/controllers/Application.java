@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang.StringUtils;
+import org.hamcrest.core.Is;
+import org.hamcrest.core.IsNull;
 
 import play.data.validation.Valid;
 import play.cache.Cache;
@@ -58,11 +60,7 @@ public class Application extends Controller {
         final String localEntrada = Configuracao.getValor("diretorio.entrada");
         Arquivo alfa = null;
         List<Arquivo> betas = new ArrayList<Arquivo>();
-                
-        //parametro.tipoSequencia = TipoSequencia.DIFERENTES;
-        
-        System.out.println(parametro.toString());
-              
+                                     
         if(validation.hasErrors()) {
             validation.keep();
             erro();
@@ -123,10 +121,7 @@ public class Application extends Controller {
                         betas.add(beta);
                         bt = null;
                     }
-                }
-                
-                //System.out.println(alfa.toString());
-                
+                }                             
 
                 if (alfa.quantidadeCaracteres < parametro.k) {
                     validation.addError("Erro", "A quantidade de diferenças (k) não pode ser maior que a quantidade de caracteres da sequência alvo!");
@@ -170,22 +165,25 @@ public class Application extends Controller {
             		validation.addError("Erro", "O limite de caracteres na ocorrência deve ser menor ou igual ao tamanho da sequência alvo!");
             	}
             }
-
          
             if (validation.hasErrors()) {
                 validation.keep();
                 erro();
-            } else {
-            	
+            } else {            	
             	Long id = ProcessamentoBean.processamento(parametro, alfa, betas);
                 result(id);
             }
         }        
     }
     
-    public static void posicao(Long processamentoId, Integer j){
-        System.out.println(processamentoId + ", " + j);
+    public static void posicao(Long processamentoId, Integer j){        
         Resultado resultado = Resultado.getResultadoPorProcessamento(processamentoId, j);
+       /* Resultado distancia = null;
+        if(resultado.distancia != null && resultado.distancia > 0){
+           	distancia = Resultado.getResultadoPorProcessamento(processamentoId, resultado.distancia);
+             
+        } 
+        render(resultado, distancia); */
         render(resultado);
     }
 
@@ -214,10 +212,6 @@ public class Application extends Controller {
 
         List<ViewProcessamento> processamentos = ViewProcessamento.listaProcessamentosSalvos(busca, pagina);
         int total = Processamento.paginasProcessamentos(busca);
-        //System.out.println("===================================");
-        //System.out.println(busca);
-        //System.out.println(pagina);
-        //System.out.println(processamentos.size());
         render(processamentos, pagina, total);
     }
 
@@ -254,11 +248,7 @@ public class Application extends Controller {
     //json para os resultados
     public static void listaResultado(Long processamentoId, Integer pagina){
         int total = Resultado.paginasResultadosPorProcessamento(processamentoId);
-        List<Resultado> resultados = Resultado.todosResultadosPorProcessamentoOrdem(processamentoId, pagina);
-//        System.out.println("===================================");
-//        System.out.println(pagina);
-//        System.out.println(resultados.size());
-        
+        List<Resultado> resultados = Resultado.todosResultadosPorProcessamentoOrdem(processamentoId, pagina);        
         render(resultados, pagina, total);
     }
 

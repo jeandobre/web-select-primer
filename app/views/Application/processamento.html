@@ -35,7 +35,6 @@
             </tbody>
         </table>
     </div>
-</div>
 
 <script>
     $( document ).ready(function (){
@@ -47,18 +46,28 @@
        });
 
         function carregar(busca, pagina){
+           //console.log(busca); 
            $('.div-ajax-carregamento-pagina').show();
            $('#table tr:last').data("liberado", 0);   
-           $.getJSON( "/processamento-json/" + busca + "/" + pagina, function( data ) {
-        	   
-               var restante = data.restante;
-               for (var i = 0; i < data.lista.length; i++) {
+           
+           $.ajax({
+               url: "/processamento-json/" + busca + "/" + pagina,
+        	   dataType:'json',
+        	   success: function( data ) {
+        		 console.log("chegou aki");
+                 var restante = data.restante;
+                 console.log(data.restante);
+                 for (var i = 0; i < data.lista.length; i++) {
                    var texto = '<tr data-linha-id="' + data.lista[i].id + '">';
                        texto +='<td  style="width: 20px;">' + data.lista[i].id + '</td>';
                        texto +='<td  style="width: 210px;">';
                        texto +='     <span class="alfa-nome">' + data.lista[i].alfaNome + '</span>';
                        texto +='     <span class="alfa-tamanho">' + data.lista[i].alfaTamanho + '</span>';
-                       texto +='<ul>' + data.lista[i].beta + '</ul></td>';
+                       texto +='<ul>';
+                       for(var j = 0; j < data.lista[i].beta.length; j++){
+                           texto += data.lista[i].beta[j].item;
+                       }
+                       texto +='</ul></td>';
                        texto +='<td  style="width: 250px;">';
                        texto +='      <span class="label label-default">Sequências ' + data.lista[i].tipoSequencia + '</span>';
                        texto +='      <div><span>Quantidade de diferenças: ' + data.lista[i].quantidadeDiferencas + '<span></div>';
@@ -96,6 +105,15 @@
                     });
                   }
                });
+        	 }, error:function (xhr, ajaxOptions, thrownError) {
+
+                // var erro = eval("(" + xhr.responseText +")" );
+
+              //   $("#ambiente-id").val('');
+               //  $("#schemas").empty().append(Novo.$templateSchemas.render({id:"", nome:"Selecione um Schema"}));
+//
+                 alert("Erro ao buscar os Schemas.\nCausa: " + thrownError);
+             }
            });     
         }
 
@@ -119,10 +137,11 @@
            $('.div-ajax-carregamento-pagina').show();
            $('#table tbody').empty();
            var busca = $("#busca").val();
+           if(busca === "") busca = "%20";
            carregar(busca, 1);
         });
 
-        carregar(" ", 1);
+        carregar("%20", 1);
     });
 
 </script>

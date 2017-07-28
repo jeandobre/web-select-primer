@@ -133,11 +133,11 @@ public class Processamento extends GenericModel {
         return (int) Math.ceil( total / linhas );
     }
 
-    public Resultado buscarResultadoPorPosicaoJ(Integer j){
-        for(Resultado re: resultados){
-            if(re.ocorrencia.j == j) return re;
-        }
+    public Ocorrencia buscarResultadoPorPosicaoJ(Integer j){
 
+        for(Resultado re: resultados){    
+            if(re.ocorrencia.j.intValue() == j.intValue()) return re.ocorrencia;            
+        }
         return null;
     }
 }

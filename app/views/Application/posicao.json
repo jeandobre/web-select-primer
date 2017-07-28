@@ -1,5 +1,8 @@
 {
   "j": "${resultado.ocorrencia.j}",
   "tamanho": "${resultado.ocorrencia.r}",
-  "sequencia": "${resultado.ocorrencia.segmento}"
+  "sequencia": "${resultado.ocorrencia.segmento}",
+  "dj": "${resultado?.distanciaOcorrencia?.j}",
+  "dtamanho": "${resultado?.distanciaOcorrencia?.r}",
+  "dsequencia": "${resultado?.distanciaOcorrencia?.segmento}"
 }

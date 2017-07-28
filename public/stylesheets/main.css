@@ -52,13 +52,18 @@
 }
 
 .ocorrencia{
-   height: 12px;
+   height: 16px;
    clear:left;
    position:relative;
    border-left: 1px solid #777;
    border-right: 1px solid #777;
-   border-bottom: 3px solid blue;
+   border-bottom: 3px solid #4169E1;
    margin-top:5px;
+   font-size: 9px;
+   font-weight: bold;
+   text-align: right;
+   color: #4169E1;
+   padding-right: 2px;
 }
 
 .page-header{
@@ -138,7 +143,13 @@ hr{
    font-size: 10px;
    color: #777;
    position: relative;
-   top: -20px;
+}
+
+#j-distancia{
+	font-size: 10px;
+	color: #777;
+	top: -11px;
+	position: relative
 }
 
 #r{
@@ -435,7 +446,7 @@ hr{
 }
 
 input[type=checkbox] + label {
-    color: #ccc;
+    color: #777;
 }
 
 input[type=checkbox] + input {
@@ -537,4 +548,43 @@ input[type=checkbox]:checked + label {
 
 #table td{
 	padding: 2px;	
+}
+
+.acgt{
+	cursor: pointer;
+}
+
+#resultado-distancia{
+	height: 30px;
+	border-left: 1px solid #888844;
+	border-right: 1px solid #888844;
+	border-bottom: 1px dotted #002b80;
+	float: left;
+	clear: both;
+	position: relative;
+	top: -35px;
+	font-size: 9px;
+	font-weight: bold;
+	text-align: center;
+	line-height: 5;
+	color: #33331a;	
+}
+
+.distancia-segmento{
+	border-left: 3px solid #4169E1;
+	padding-left: 2px;
+}
+
+#ocr-distancia{
+	float: left;
+	position: relative;
+	top: -64px;
+}
+
+.label-warning{
+	margin-left: 3px;
+}
+
+.badge{
+	margin-top: 0px;
 }

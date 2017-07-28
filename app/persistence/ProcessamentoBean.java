@@ -106,6 +106,7 @@ public class ProcessamentoBean {
         processamento.resultados = new ArrayList<Resultado>();
         Boolean temLinha = true;
         Integer linha = 0;
+        Integer maxJ = 0;
         while(temLinha){
             Ocorrencia ocr = processamento.maiorPorPosicao(linha);
             if(ocr != null){
@@ -114,6 +115,7 @@ public class ProcessamentoBean {
                 result.processamento = processamento;
                 processamento.resultados.add(result);
                 linha++;
+                if(ocr.j > maxJ) maxJ = ocr.j;
             } else {
                 temLinha = false;
             }
@@ -130,19 +132,24 @@ public class ProcessamentoBean {
             processamento.resultados.removeAll(remover);
         }
 
-        remover.clear();
-        if(processamento.mostrarDistancia){
+        remover.clear();        
+        if(processamento.mostrarDistancia){  
             for(Resultado re: processamento.resultados) {
-                if(re.distancia != null && re.distancia > 0) continue;
                 Integer vv = re.ocorrencia.j;
-                Resultado dRe = processamento.buscarResultadoPorPosicaoJ(vv + processamento.distancia);
-                if (dRe == null){
-                    remover.add(re);
-                } else{
-                    dRe.distancia = vv;
-                    re.distancia = vv + processamento.distancia;
-                }
+                Integer idx = vv + re.ocorrencia.r + processamento.distancia;
+                                
+                if(idx.intValue() <= maxJ.intValue()){
+                  Ocorrencia ocorrencia = processamento.buscarResultadoPorPosicaoJ(idx);
+                  if(ocorrencia != null){
+                	  re.distancia = idx;
+                	  re.distanciaOcorrencia = ocorrencia;
+                  }else
+                	  remover.add(re);
+                } else 
+                	  remover.add(re);
             }
+            
+            
             processamento.resultados.removeAll(remover);
         }
 

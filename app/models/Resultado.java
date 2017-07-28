@@ -38,6 +38,10 @@ public class Resultado extends GenericModel {
     public Menor menor;
 
     public Integer distancia;
+    
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "distancia_ocorrencia_id", referencedColumnName="id")
+    public Ocorrencia distanciaOcorrencia;
 
     public static Resultado getResultadoPorProcessamento(Long processamentoId, Integer j){
         return find("processamento.id = :processamentoId and ocorrencia.j = :j")
