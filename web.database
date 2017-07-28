@@ -1,147 +1,214 @@
-CREATE TABLE public.betas
-(
-  id serial NOT NULL,
-  processamento_id integer,
-  nome character varying(230),
-  arquivo text,
-  tamanho integer,
-  arquivo_resultado character varying,
-  posicao integer,
-  CONSTRAINT betas_pkey PRIMARY KEY (id)
-)
-WITH (
-  OIDS=FALSE
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+CREATE TABLE betas (
+    id integer NOT NULL,
+    processamento_id integer,
+    nome character varying(230),
+    arquivo text,
+    tamanho integer,
+    arquivo_resultado character varying,
+    posicao integer
 );
 
-CREATE TABLE public.configuracoes
-(
-  key character varying(40) NOT NULL,
-  valor character varying,
-  CONSTRAINT configuracoes_pkey PRIMARY KEY (key)
-)
-WITH (
-  OIDS=FALSE
-);
+ALTER TABLE betas OWNER TO postgres;
 
+CREATE SEQUENCE betas_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
-CREATE TABLE public.ocorrencias
-(
-  id serial NOT NULL DEFAULT,
-  beta_id integer,
-  j integer,
-  r integer,
-  segmento text,
-  letra character varying(1),
-  posicao_tela integer,
-  CONSTRAINT ocorrencias_pkey PRIMARY KEY (id),
-  CONSTRAINT ocorrencias_beta_id_fkey FOREIGN KEY (beta_id)
-      REFERENCES public.betas (id) MATCH SIMPLE
-      ON UPDATE RESTRICT ON DELETE RESTRICT,
-  CONSTRAINT ocorrencias_beta_id_j_key UNIQUE (beta_id, j)
-)
-WITH (
-  OIDS=FALSE
-);
+ALTER TABLE betas_id_seq OWNER TO postgres;
 
-CREATE TABLE public.processamentos
-(
-  id serial NOT NULL DEFAULT,
-  inicio timestamp with time zone,
-  fim timestamp with time zone,
-  tempo_gasto_segundos integer,
-  alfa_nome character varying(230),
-  alfa_arquivo character varying(300),
-  alfa_tamanho integer,
-  mostrar_maior_menor boolean,
-  mostrar_entre_mil_dois_mil boolean,
-  posicao integer,
-  distancia integer,
-  processamento text,
-  nome character varying(230),
-  informacao text,
-  salvo boolean NOT NULL DEFAULT false,
-  programa_id integer,
-  quantidade_diferencas integer NOT NULL DEFAULT 1,
-  maior_tamanho integer,
-  menor_tamanho integer,
-  mostrar_distancia boolean,
-  mostrar_limite_caracteres boolean,
-  j_inicio integer,
-  j_fim integer,
-  limite_caracteres integer,
-  tipo_sequencia character varying(20),
-  CONSTRAINT processamentos_pkey PRIMARY KEY (id)
-)
-WITH (
-  OIDS=FALSE
+ALTER SEQUENCE betas_id_seq OWNED BY betas.id;
+
+CREATE TABLE configuracoes (
+    key character varying(40) NOT NULL,
+    valor character varying
 );
 
 
-CREATE TABLE public.programas
-(
-  id serial NOT NULL DEFAULT,
-  nome character varying(250),
-  local text,
-  tipo_sequencia character varying(20),
-  versao character varying(10),
-  ativo boolean NOT NULL DEFAULT true,
-  parametros character varying(40),
-  CONSTRAINT programas_pkey PRIMARY KEY (id)
-)
-WITH (
-  OIDS=FALSE
-);
+ALTER TABLE configuracoes OWNER TO postgres;
 
-CREATE TABLE public.resultados
-(
-  id serial NOT NULL DEFAULT, 
-  processamento_id integer,
-  ocorrencia_id integer,
-  distancia integer,
-  CONSTRAINT resultados_pkey PRIMARY KEY (id),
-  CONSTRAINT resultados_ocorrencia_id_fkey FOREIGN KEY (ocorrencia_id)
-      REFERENCES public.ocorrencias (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
-  CONSTRAINT resultados_processamento_id_fkey FOREIGN KEY (processamento_id)
-      REFERENCES public.processamentos (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-)
-WITH (
-  OIDS=FALSE
+CREATE TABLE maiores (
+    id integer NOT NULL,
+    resultado_id integer
 );
 
 
-CREATE TABLE public.maiores
-(
-  id serial NOT NULL DEFAULT,
-  resultado_id integer,
-  CONSTRAINT maiores_pkey PRIMARY KEY (id),
-  CONSTRAINT maiores_resultado_id_fkey FOREIGN KEY (resultado_id)
-      REFERENCES public.resultados (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-)
-WITH (
-  OIDS=FALSE
+ALTER TABLE maiores OWNER TO postgres;
+
+CREATE SEQUENCE maiores_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER TABLE maiores_id_seq OWNER TO postgres;
+
+ALTER SEQUENCE maiores_id_seq OWNED BY maiores.id;
+
+CREATE TABLE menores (
+    id integer NOT NULL,
+    resultado_id integer
 );
 
 
-CREATE TABLE public.menores
-(
-  id serial NOT NULL DEFAULT,
-  resultado_id integer,
-  CONSTRAINT menores_pkey PRIMARY KEY (id),
-  CONSTRAINT menores_resultado_id_fkey FOREIGN KEY (resultado_id)
-      REFERENCES public.resultados (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
-)
-WITH (
-  OIDS=FALSE
+ALTER TABLE menores OWNER TO postgres;
+
+CREATE SEQUENCE menores_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE menores_id_seq OWNER TO postgres;
+
+ALTER SEQUENCE menores_id_seq OWNED BY menores.id;
+
+CREATE TABLE ocorrencias (
+    id integer NOT NULL,
+    beta_id integer,
+    j integer,
+    r integer,
+    segmento text,
+    letra character varying(1),
+    posicao_tela integer
 );
 
 
+ALTER TABLE ocorrencias OWNER TO postgres;
+
+CREATE SEQUENCE ocorrencias_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
 
 
-CREATE OR REPLACE VIEW public.view_processamentos AS 
+ALTER TABLE ocorrencias_id_seq OWNER TO postgres;
+
+ALTER SEQUENCE ocorrencias_id_seq OWNED BY ocorrencias.id;
+
+CREATE TABLE processamentos (
+    id integer NOT NULL,
+    inicio timestamp with time zone,
+    fim timestamp with time zone,
+    tempo_gasto_segundos integer,
+    alfa_nome character varying(230),
+    alfa_arquivo character varying(300),
+    alfa_tamanho integer,
+    mostrar_maior_menor boolean,
+    mostrar_entre_mil_dois_mil boolean,
+    posicao integer,
+    distancia integer,
+    processamento text,
+    nome character varying(230),
+    informacao text,
+    salvo boolean DEFAULT false NOT NULL,
+    programa_id integer,
+    quantidade_diferencas integer DEFAULT 1 NOT NULL,
+    maior_tamanho integer,
+    menor_tamanho integer,
+    mostrar_distancia boolean,
+    mostrar_limite_caracteres boolean,
+    j_inicio integer,
+    j_fim integer,
+    limite_caracteres integer,
+    tipo_sequencia character varying(20)
+);
+
+
+ALTER TABLE processamentos OWNER TO postgres;
+
+CREATE SEQUENCE processamentos_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE processamentos_id_seq OWNER TO postgres;
+
+ALTER SEQUENCE processamentos_id_seq OWNED BY processamentos.id;
+
+CREATE TABLE programas (
+    id integer NOT NULL,
+    nome character varying(250),
+    local text,
+    tipo_sequencia character varying(20),
+    versao character varying(10),
+    ativo boolean DEFAULT true NOT NULL,
+    parametros character varying(40)
+);
+
+
+ALTER TABLE programas OWNER TO postgres;
+
+CREATE SEQUENCE programas_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE programas_id_seq OWNER TO postgres;
+
+ALTER SEQUENCE programas_id_seq OWNED BY programas.id;
+
+CREATE TABLE resultados (
+    id integer NOT NULL,
+    processamento_id integer,
+    ocorrencia_id integer,
+    distancia integer,
+    distancia_ocorrencia_id integer
+);
+
+
+ALTER TABLE resultados OWNER TO postgres;
+
+COMMENT ON COLUMN resultados.id IS 'se';
+
+CREATE SEQUENCE resultados_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE resultados_id_seq OWNER TO postgres;
+
+ALTER SEQUENCE resultados_id_seq OWNED BY resultados.id;
+
+CREATE VIEW view_processamentos AS
  SELECT p.id,
     p.alfa_nome,
     p.alfa_tamanho,
@@ -150,13 +217,76 @@ CREATE OR REPLACE VIEW public.view_processamentos AS
     p.quantidade_diferencas,
     p.tipo_sequencia,
     count(rs.id) AS ocorrencias
-   FROM processamentos p
-     JOIN resultados rs ON rs.processamento_id = p.id
-  WHERE p.salvo = true
+   FROM (processamentos p
+     LEFT JOIN resultados rs ON ((rs.processamento_id = p.id)))
+  WHERE (p.salvo = true)
   GROUP BY p.id, p.alfa_nome, p.alfa_tamanho, p.nome, p.informacao, p.quantidade_diferencas, p.tipo_sequencia;
 
 
+ALTER TABLE view_processamentos OWNER TO postgres;
 
+ALTER TABLE ONLY betas ALTER COLUMN id SET DEFAULT nextval('betas_id_seq'::regclass);
 
+ALTER TABLE ONLY maiores ALTER COLUMN id SET DEFAULT nextval('maiores_id_seq'::regclass);
 
+ALTER TABLE ONLY menores ALTER COLUMN id SET DEFAULT nextval('menores_id_seq'::regclass);
 
+ALTER TABLE ONLY ocorrencias ALTER COLUMN id SET DEFAULT nextval('ocorrencias_id_seq'::regclass);
+
+ALTER TABLE ONLY processamentos ALTER COLUMN id SET DEFAULT nextval('processamentos_id_seq'::regclass);
+
+ALTER TABLE ONLY programas ALTER COLUMN id SET DEFAULT nextval('programas_id_seq'::regclass);
+
+ALTER TABLE ONLY resultados ALTER COLUMN id SET DEFAULT nextval('resultados_id_seq'::regclass);
+
+ALTER TABLE ONLY betas
+    ADD CONSTRAINT betas_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY configuracoes
+    ADD CONSTRAINT configuracoes_pkey PRIMARY KEY (key);
+
+ALTER TABLE ONLY maiores
+    ADD CONSTRAINT maiores_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY menores
+    ADD CONSTRAINT menores_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY ocorrencias
+    ADD CONSTRAINT ocorrencias_beta_id_j_key UNIQUE (beta_id, j);
+
+ALTER TABLE ONLY ocorrencias
+    ADD CONSTRAINT ocorrencias_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY processamentos
+    ADD CONSTRAINT processamentos_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY programas
+    ADD CONSTRAINT programas_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY resultados
+    ADD CONSTRAINT resultados_pkey PRIMARY KEY (id);
+
+ALTER TABLE ONLY maiores
+    ADD CONSTRAINT maiores_resultado_id_fkey FOREIGN KEY (resultado_id) REFERENCES resultados(id);
+
+ALTER TABLE ONLY menores
+    ADD CONSTRAINT menores_resultado_id_fkey FOREIGN KEY (resultado_id) REFERENCES resultados(id);
+
+ALTER TABLE ONLY ocorrencias
+    ADD CONSTRAINT ocorrencias_beta_id_fkey FOREIGN KEY (beta_id) REFERENCES betas(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY resultados
+    ADD CONSTRAINT resultados_ocorrencia_id_fkey FOREIGN KEY (ocorrencia_id) REFERENCES ocorrencias(id);
+
+ALTER TABLE ONLY resultados
+    ADD CONSTRAINT resultados_processamento_id_fkey FOREIGN KEY (processamento_id) REFERENCES processamentos(id);
+
+INSERT INTO configuracoes VALUES ('sequencia.diferente.linux', '1');
+INSERT INTO configuracoes VALUES ('sequencia.parecida.linux', '2');
+INSERT INTO configuracoes VALUES ('diretorio.entrada.linux', '/home/jean/k-difference-prime/dados');
+INSERT INTO configuracoes VALUES ('diretorio.saida.linux', '/home/jean/k-difference-prime/saida');
+
+INSERT INTO programas VALUES (1, 'KPD1', '/home/jean/k-difference-prime/kdifferenceprime1', 'DIFERENTES', '2.0', true, '-vs1');
+INSERT INTO programas VALUES (2, 'KDP2', '/home/jean/k-difference-prime/kdifferenceprime2', 'PARECIDAS', '2.0', true, '-vs1');
+
+SELECT pg_catalog.setval('programas_id_seq', 2, true);
