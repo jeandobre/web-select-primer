@@ -1,0 +1,78 @@
+#{extends 'main.html' /}
+#{set title:'Web Primers [Configurações]' /}
+#{set pagina:'Configurações' /}
+
+<link href="@{'/public/stylesheets/jquery.filer.css'}" rel="stylesheet">
+<script src="@{'/public/javascripts/jquery.filer.min.js'}" type="text/javascript" charset="${_response_encoding}"></script>
+
+  #{form @Application.configSalvar(), enctype:'multipart/form-data', id:'formulario' }
+
+    #{set 'controles'}
+      <input id="processar-top" class="btn btn-success processar" type="submit" value="Salvar"
+      	  	 title="Clique aqui para salvar as alterações efetuadas">
+    #{/set}
+
+    <div class="panel">
+    
+      <div class="alert alert-warning" role="alert">
+         <strong>Cuidado!</strong> As pastas deverão ter permissão de leitura e escrita.
+      </div>
+    
+      <div class="input-group">
+		  <span class="input-group-addon" id="basic-addon3">Diretório onde os arquivos serão carregados</span>
+		  <input name="entrada" type="text" class="form-control" id="basic-url" 
+		         aria-describedby="basic-addon3" value="${entrada}">
+	  </div>
+	  <div class="input-group" style="margin-top:2px">
+		  <span class="input-group-addon" id="basic-addon3">Diretório onde os resultados serão salvos</span>
+		  <input name="saida" type="text" class="form-control" id="basic-url" 
+		         aria-describedby="basic-addon3" value="${saida}">
+	  </div>
+    </div>
+  #{/form}
+  
+  <div class="alert alert-info" role="alert">
+         <strong>Atenção!</strong> Os programas que estiverem ativos aqui aparecerão na tela inicial para uso.
+      </div>
+
+  <div class="panel">
+    <table class="table table-striped table-hover ">
+        <thead>
+            <tr>
+                <th style="width: 20px">#</th>
+                <th>Programa</th>
+                <th style="width: 350px">local</th>
+                <th style="width: 120px">Tipo de sequências</th>
+                <th style="width: 40px">Versão</th>
+                <th style="width: 40px">Ativo</th>
+               
+            </tr>
+        </thead>
+        <tbody>
+			#{list items:programas, as: 'pr'}
+				<tr>
+					<td>${pr.id}</td>
+					<td>${pr.nome}</td>
+					<td>${pr.local}</td>
+					<td>${pr.tipoSequencia}</td>
+					<td>${pr.versao}</td>
+					<td align="center">
+					 #{if pr.ativo} 
+					   <img src="/public/images/ativo.png" />
+					 #{/ if}  
+					</td>				
+				</tr>	
+			#{/list}
+        </tbody>
+    </table>
+  </div>
+<script>
+  $( document ).ready(function() {
+
+	$("#processar-top").click(function(){
+       $('.div-ajax-carregamento-pagina').show();
+       $( "#formulario" ).submit();
+       
+    });
+  });
+</script>
